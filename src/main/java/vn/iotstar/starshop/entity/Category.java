@@ -16,12 +16,20 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(
+        nullable = false,
+        unique = true,
+        length = 100,
+        columnDefinition = "nvarchar(100)"
+    )
     private String name;
 
     private String image;
 
-    @Column(length = 500)
+    @Column(
+        length = 500,
+        columnDefinition = "nvarchar(500)"
+    )
     private String description;
 
     @Column(nullable = false)
