@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.dto.ShopRequest;
 import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.entity.User;
+import vn.iotstar.starshop.enums.ShopStatus;
 import vn.iotstar.starshop.repository.UserRepository;
 import vn.iotstar.starshop.service.ShopService;
 
@@ -58,6 +59,7 @@ public class VendorController {
                     "errorMessage",
                     "Thông tin đăng ký chưa hợp lệ. Vui lòng kiểm tra lại."
             );
+
             return "vendor/shop-register";
         }
 
@@ -68,6 +70,7 @@ public class VendorController {
                     "errorMessage",
                     "Không tìm thấy tài khoản người dùng trong hệ thống."
             );
+
             return "vendor/shop-register";
         }
 
@@ -86,6 +89,42 @@ public class VendorController {
         return "redirect:/vendor/shop/register";
     }
 
+    @GetMapping("/dashboard")
+    public String showDashboard(
+            Authentication authentication,
+            Model model) {
+
+        User owner = getCurrentUser(authentication);
+
+        if (owner == null) {
+            return "redirect:/vendor/shops";
+        }
+
+        List<Shop> shops = shopService.getShopsByOwner(owner.getId());
+
+        long totalShops = shops.size();
+
+        long pendingShops = shops.stream()
+                .filter(shop -> shop.getStatus() == ShopStatus.PENDING)
+                .count();
+
+        long activeShops = shops.stream()
+                .filter(shop -> shop.getStatus() == ShopStatus.ACTIVE)
+                .count();
+
+        long blockedShops = shops.stream()
+                .filter(shop -> shop.getStatus() == ShopStatus.BLOCKED)
+                .count();
+
+        model.addAttribute("totalShops", totalShops);
+        model.addAttribute("pendingShops", pendingShops);
+        model.addAttribute("activeShops", activeShops);
+        model.addAttribute("blockedShops", blockedShops);
+        model.addAttribute("shops", shops);
+
+        return "vendor/dashboard";
+    }
+
     @GetMapping("/shops")
     public String showMyShops(
             Authentication authentication,
@@ -98,6 +137,7 @@ public class VendorController {
                     "errorMessage",
                     "Không tìm thấy tài khoản người dùng."
             );
+
             return "vendor/shop-list";
         }
 
@@ -148,6 +188,7 @@ public class VendorController {
         );
 
         ShopRequest request = new ShopRequest();
+
         request.setName(shop.getName());
         request.setDescription(shop.getDescription());
         request.setPhone(shop.getPhone());
@@ -184,6 +225,7 @@ public class VendorController {
             );
 
             model.addAttribute("shop", shop);
+
             model.addAttribute(
                     "errorMessage",
                     "Thông tin cửa hàng chưa hợp lệ."
