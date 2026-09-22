@@ -5,8 +5,11 @@
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
 
@@ -14,6 +17,39 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <style>
+        .product-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .no-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            background: #f1f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            vertical-align: middle;
+        }
+    </style>
+
 </head>
 
 <body class="bg-light">
@@ -23,10 +59,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
+
             <h2>Quản lý sản phẩm</h2>
+
             <div class="text-muted">
                 ${shop.name}
             </div>
+
         </div>
 
         <a class="btn btn-primary"
@@ -37,9 +76,27 @@
     </div>
 
     <c:if test="${not empty successMessage}">
+
         <div class="alert alert-success">
             ${successMessage}
         </div>
+
+    </c:if>
+
+    <c:if test="${not empty warningMessage}">
+
+        <div class="alert alert-warning">
+            ${warningMessage}
+        </div>
+
+    </c:if>
+
+    <c:if test="${not empty errorMessage}">
+
+        <div class="alert alert-danger">
+            ${errorMessage}
+        </div>
+
     </c:if>
 
     <form method="get"
@@ -48,11 +105,13 @@
         <div class="row g-3">
 
             <div class="col-md-4">
+
                 <input type="text"
                        name="keyword"
                        value="${keyword}"
                        class="form-control"
                        placeholder="Tên hoặc mô tả sản phẩm">
+
             </div>
 
             <div class="col-md-3">
@@ -152,6 +211,7 @@
 
                 <tr>
                     <th>ID</th>
+                    <th>Ảnh</th>
                     <th>Tên sản phẩm</th>
                     <th>Danh mục</th>
                     <th>Giá</th>
@@ -170,28 +230,66 @@
 
                     <tr>
 
-                        <td>${product.id}</td>
-
-                        <td>${product.name}</td>
-
-                        <td>${product.category.name}</td>
+                        <td>
+                            ${product.id}
+                        </td>
 
                         <td>
+
+                            <c:choose>
+
+                                <c:when test="${not empty primaryImages[product.id]}">
+
+                                    <img src="${primaryImages[product.id]}"
+                                         class="product-thumbnail"
+                                         alt="${product.name}">
+
+                                </c:when>
+
+                                <c:otherwise>
+
+                                    <div class="no-image">
+                                        Chưa có ảnh
+                                    </div>
+
+                                </c:otherwise>
+
+                            </c:choose>
+
+                        </td>
+
+                        <td>
+                            ${product.name}
+                        </td>
+
+                        <td>
+                            ${product.category.name}
+                        </td>
+
+                        <td>
+
                             <fmt:formatNumber
                                     value="${product.price}"
                                     groupingUsed="true"
                                     maxFractionDigits="0"/>
                             ₫
+
                         </td>
 
-                        <td>${product.quantity}</td>
-
-                        <td>${product.soldCount}</td>
+                        <td>
+                            ${product.quantity}
+                        </td>
 
                         <td>
+                            ${product.soldCount}
+                        </td>
+
+                        <td>
+
                             <span class="badge text-bg-secondary">
                                 ${product.status}
                             </span>
+
                         </td>
 
                         <td>
@@ -226,10 +324,12 @@
                 <c:if test="${empty products.content}">
 
                     <tr>
-                        <td colspan="8"
+
+                        <td colspan="9"
                             class="text-center py-4 text-muted">
                             Chưa có sản phẩm phù hợp.
                         </td>
+
                     </tr>
 
                 </c:if>
@@ -278,8 +378,8 @@
 
                     <a href="${pageUrl}"
                        class="btn ${i == products.number
-                            ? 'btn-primary'
-                            : 'btn-outline-primary'}">
+                           ? 'btn-primary'
+                           : 'btn-outline-primary'}">
                         ${i + 1}
                     </a>
 
@@ -303,4 +403,5 @@
 </div>
 
 </body>
+
 </html>

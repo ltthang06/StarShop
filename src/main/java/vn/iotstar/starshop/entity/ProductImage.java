@@ -19,6 +19,9 @@ public class ProductImage {
     @Column(nullable = false, length = 500)
     private String imageUrl;
 
+    @Column(length = 255)
+    private String publicId;
+
     @Column(nullable = false)
     private boolean primaryImage = false;
 

@@ -13,12 +13,24 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        ${editing ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}
-        - StarShop
+        ${editing ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'} - StarShop
     </title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <style>
+        .product-image-card {
+            width: 160px;
+        }
+
+        .product-image-preview {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
 
 </head>
 
@@ -28,7 +40,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="col-lg-8">
+        <div class="col-lg-9">
 
             <div class="card shadow-sm">
 
@@ -45,14 +57,94 @@
                     </p>
 
                     <c:if test="${not empty errorMessage}">
-
                         <div class="alert alert-danger">
                             ${errorMessage}
                         </div>
+                    </c:if>
+
+                    <c:if test="${not empty warningMessage}">
+                        <div class="alert alert-warning">
+                            ${warningMessage}
+                        </div>
+                    </c:if>
+
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">
+                            ${successMessage}
+                        </div>
+                    </c:if>
+
+                    <c:if test="${editing}">
+
+                        <h5 class="mb-3">
+                            Ảnh hiện tại
+                        </h5>
+
+                        <c:choose>
+
+                            <c:when test="${not empty productImages}">
+
+                                <div class="d-flex flex-wrap gap-3 mb-4">
+
+                                    <c:forEach items="${productImages}"
+                                               var="image">
+
+                                        <div class="card product-image-card">
+
+                                            <div class="card-body p-2">
+
+                                                <img src="${image.imageUrl}"
+                                                     class="product-image-preview"
+                                                     alt="Ảnh sản phẩm">
+
+                                                <c:if test="${image.primaryImage}">
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-success">
+                                                            Ảnh chính
+                                                        </span>
+                                                    </div>
+                                                </c:if>
+
+                                                <form method="post"
+                                                      class="mt-2"
+                                                      action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/products/${productId}/images/${image.id}/delete">
+
+                                                    <input type="hidden"
+                                                           name="${_csrf.parameterName}"
+                                                           value="${_csrf.token}">
+
+                                                    <button type="submit"
+                                                            class="btn btn-outline-danger btn-sm w-100"
+                                                            onclick="return confirm('Bạn có chắc muốn xóa ảnh này?');">
+                                                        Xóa ảnh
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </c:forEach>
+
+                                </div>
+
+                            </c:when>
+
+                            <c:otherwise>
+
+                                <div class="alert alert-secondary mb-4">
+                                    Sản phẩm chưa có ảnh.
+                                </div>
+
+                            </c:otherwise>
+
+                        </c:choose>
 
                     </c:if>
 
                     <form method="post"
+                          enctype="multipart/form-data"
                           action="${pageContext.request.contextPath}${formAction}">
 
                         <input type="hidden"
@@ -194,6 +286,31 @@
                                     </c:forEach>
 
                                 </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Ảnh sản phẩm
+                            </label>
+
+                            <input type="file"
+                                   name="images"
+                                   class="form-control"
+                                   accept="image/*"
+                                   multiple>
+
+                            <div class="form-text">
+
+                                Có thể chọn nhiều ảnh cùng lúc.
+                                Ảnh đầu tiên của sản phẩm sẽ được dùng làm ảnh chính.
+
+                                <c:if test="${editing}">
+                                    Các ảnh mới sẽ được thêm vào những ảnh hiện có.
+                                </c:if>
 
                             </div>
 
