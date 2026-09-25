@@ -1,0 +1,90 @@
+/* ===== GENERAL ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* ===== NAVBAR ===== */
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+/* ===== PRODUCT CARD ===== */
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+    height: 220px;
+    object-fit: cover;
+}
+
+.product-card .price {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.product-card .old-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* ===== HERO BANNER ===== */
+.hero-banner {
+    background: linear-gradient(135deg, #dc3545, #ff6b6b);
+    color: white;
+    padding: 80px 0;
+    margin-bottom: 40px;
+}
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+    position: relative;
+    font-weight: bold;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: #dc3545;
+}
+
+/* ===== BUTTONS ===== */
+.btn-starshop {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 25px;
+    padding: 8px 24px;
+}
+
+.btn-starshop:hover {
+    background-color: #b02a37;
+    color: white;
+}
+
+/* ===== CART ===== */
+.cart-badge {
+    position: relative;
+}
+
+/* ===== FOOTER ===== */
+footer a:hover {
+    color: white !important;
+}
