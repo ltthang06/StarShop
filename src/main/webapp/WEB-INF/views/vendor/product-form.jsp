@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
+<%@ taglib prefix="c"
+           uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -185,7 +187,7 @@
                             <div class="col-md-6 mb-3">
 
                                 <label class="form-label">
-                                    Giá bán
+                                    Giá bán (VNĐ)
                                 </label>
 
                                 <input type="number"
@@ -201,7 +203,7 @@
                             <div class="col-md-6 mb-3">
 
                                 <label class="form-label">
-                                    Giá khuyến mãi
+                                    Giá khuyến mãi (VNĐ)
                                 </label>
 
                                 <input type="number"

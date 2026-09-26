@@ -3,6 +3,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
+<fmt:setLocale value="vi_VN" />
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -76,27 +78,21 @@
     </div>
 
     <c:if test="${not empty successMessage}">
-
         <div class="alert alert-success">
             ${successMessage}
         </div>
-
     </c:if>
 
     <c:if test="${not empty warningMessage}">
-
         <div class="alert alert-warning">
             ${warningMessage}
         </div>
-
     </c:if>
 
     <c:if test="${not empty errorMessage}">
-
         <div class="alert alert-danger">
             ${errorMessage}
         </div>
-
     </c:if>
 
     <form method="get"
@@ -270,9 +266,10 @@
 
                             <fmt:formatNumber
                                     value="${product.price}"
+                                    type="number"
                                     groupingUsed="true"
                                     maxFractionDigits="0"/>
-                            ₫
+                            VNĐ
 
                         </td>
 
@@ -403,5 +400,4 @@
 </div>
 
 </body>
-
 </html>

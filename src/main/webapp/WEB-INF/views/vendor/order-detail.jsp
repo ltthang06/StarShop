@@ -1,7 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
+<%@ taglib prefix="c"
+           uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt"
+           uri="jakarta.tags.fmt" %>
+
+<fmt:setLocale value="vi_VN" />
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -99,19 +104,25 @@
                                     </td>
 
                                     <td>
+
                                         <fmt:formatNumber
                                                 value="${detail.unitPrice}"
+                                                type="number"
                                                 groupingUsed="true"
                                                 maxFractionDigits="0"/>
-                                        ₫
+                                        VNĐ
+
                                     </td>
 
                                     <td>
+
                                         <fmt:formatNumber
                                                 value="${detail.subtotal}"
+                                                type="number"
                                                 groupingUsed="true"
                                                 maxFractionDigits="0"/>
-                                        ₫
+                                        VNĐ
+
                                     </td>
 
                                 </tr>
@@ -179,9 +190,10 @@
 
                         <fmt:formatNumber
                                 value="${order.subtotal}"
+                                type="number"
                                 groupingUsed="true"
                                 maxFractionDigits="0"/>
-                        ₫
+                        VNĐ
                     </p>
 
                     <p>
@@ -189,9 +201,10 @@
 
                         <fmt:formatNumber
                                 value="${order.shippingFee}"
+                                type="number"
                                 groupingUsed="true"
                                 maxFractionDigits="0"/>
-                        ₫
+                        VNĐ
                     </p>
 
                     <p>
@@ -199,9 +212,10 @@
 
                         <fmt:formatNumber
                                 value="${order.discountAmount}"
+                                type="number"
                                 groupingUsed="true"
                                 maxFractionDigits="0"/>
-                        ₫
+                        VNĐ
                     </p>
 
                     <p class="fs-5">
@@ -209,9 +223,10 @@
 
                         <fmt:formatNumber
                                 value="${order.totalAmount}"
+                                type="number"
                                 groupingUsed="true"
                                 maxFractionDigits="0"/>
-                        ₫
+                        VNĐ
                     </p>
 
                     <p>

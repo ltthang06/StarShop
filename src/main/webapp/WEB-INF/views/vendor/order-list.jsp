@@ -3,6 +3,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
+<fmt:setLocale value="vi_VN" />
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -166,9 +168,10 @@
 
                             <fmt:formatNumber
                                     value="${order.totalAmount}"
+                                    type="number"
                                     groupingUsed="true"
                                     maxFractionDigits="0"/>
-                            ₫
+                            VNĐ
 
                         </td>
 
