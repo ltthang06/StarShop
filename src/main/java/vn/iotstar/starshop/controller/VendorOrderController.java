@@ -26,7 +26,9 @@ import vn.iotstar.starshop.service.ShopService;
 public class VendorOrderController {
 
     private final OrderService orderService;
+
     private final ShopService shopService;
+
     private final UserRepository userRepository;
 
     @GetMapping
@@ -44,52 +46,66 @@ public class VendorOrderController {
             Model model) {
 
         User owner =
-                getCurrentUser(authentication);
+                getCurrentUser(
+                        authentication
+                );
 
         if (owner == null) {
             return "redirect:/vendor";
         }
 
         Shop shop =
-                shopService.getShopByOwner(
-                        shopId,
-                        owner.getId());
+                shopService
+                        .getShopByOwner(
+                                shopId,
+                                owner.getId()
+                        );
 
         OrderStatus statusValue =
-                parseStatus(status);
+                parseStatus(
+                        status
+                );
 
         Page<Order> orders =
-                orderService.searchVendorOrders(
-                        shopId,
-                        owner.getId(),
-                        keyword,
-                        statusValue,
-                        page,
-                        size);
+                orderService
+                        .searchVendorOrders(
+                                shopId,
+                                owner.getId(),
+                                keyword,
+                                statusValue,
+                                page,
+                                size
+                        );
 
         model.addAttribute(
                 "shop",
-                shop);
+                shop
+        );
 
         model.addAttribute(
                 "orders",
-                orders);
+                orders
+        );
 
         model.addAttribute(
                 "statuses",
-                OrderStatus.values());
+                OrderStatus.values()
+        );
 
         model.addAttribute(
                 "keyword",
-                keyword);
+                keyword
+        );
 
         model.addAttribute(
                 "selectedStatus",
-                statusValue);
+                statusValue
+        );
 
         model.addAttribute(
                 "size",
-                size);
+                size
+        );
 
         return "vendor/order-list";
     }
@@ -102,35 +118,46 @@ public class VendorOrderController {
             Model model) {
 
         User owner =
-                getCurrentUser(authentication);
+                getCurrentUser(
+                        authentication
+                );
 
         if (owner == null) {
             return "redirect:/vendor";
         }
 
         Shop shop =
-                shopService.getShopByOwner(
-                        shopId,
-                        owner.getId());
+                shopService
+                        .getShopByOwner(
+                                shopId,
+                                owner.getId()
+                        );
 
         Order order =
-                orderService.getOrderByOwner(
-                        orderId,
-                        shopId,
-                        owner.getId());
+                orderService
+                        .getOrderByOwner(
+                                orderId,
+                                shopId,
+                                owner.getId()
+                        );
 
         model.addAttribute(
                 "shop",
-                shop);
+                shop
+        );
 
         model.addAttribute(
                 "order",
-                order);
+                order
+        );
 
         model.addAttribute(
                 "orderDetails",
-                orderService.getOrderDetails(
-                        orderId));
+                orderService
+                        .getOrderDetails(
+                                orderId
+                        )
+        );
 
         return "vendor/order-detail";
     }
@@ -143,7 +170,9 @@ public class VendorOrderController {
             RedirectAttributes redirectAttributes) {
 
         User owner =
-                getCurrentUser(authentication);
+                getCurrentUser(
+                        authentication
+                );
 
         if (owner == null) {
             return "redirect:/vendor";
@@ -154,24 +183,28 @@ public class VendorOrderController {
             orderService.confirmOrder(
                     orderId,
                     shopId,
-                    owner.getId());
+                    owner.getId()
+            );
 
             redirectAttributes
                     .addFlashAttribute(
                             "successMessage",
-                            "Xác nhận đơn hàng thành công.");
+                            "Xác nhận đơn hàng thành công."
+                    );
 
         } catch (IllegalArgumentException e) {
 
             redirectAttributes
                     .addFlashAttribute(
                             "errorMessage",
-                            e.getMessage());
+                            e.getMessage()
+                    );
         }
 
         return redirectToDetail(
                 shopId,
-                orderId);
+                orderId
+        );
     }
 
     @PostMapping("/{orderId}/ready")
@@ -182,7 +215,9 @@ public class VendorOrderController {
             RedirectAttributes redirectAttributes) {
 
         User owner =
-                getCurrentUser(authentication);
+                getCurrentUser(
+                        authentication
+                );
 
         if (owner == null) {
             return "redirect:/vendor";
@@ -193,24 +228,28 @@ public class VendorOrderController {
             orderService.markReadyForPickup(
                     orderId,
                     shopId,
-                    owner.getId());
+                    owner.getId()
+            );
 
             redirectAttributes
                     .addFlashAttribute(
                             "successMessage",
-                            "Đơn hàng đã sẵn sàng để lấy.");
+                            "Đơn hàng đã sẵn sàng để lấy."
+                    );
 
         } catch (IllegalArgumentException e) {
 
             redirectAttributes
                     .addFlashAttribute(
                             "errorMessage",
-                            e.getMessage());
+                            e.getMessage()
+                    );
         }
 
         return redirectToDetail(
                 shopId,
-                orderId);
+                orderId
+        );
     }
 
     @PostMapping("/{orderId}/cancel")
@@ -221,7 +260,9 @@ public class VendorOrderController {
             RedirectAttributes redirectAttributes) {
 
         User owner =
-                getCurrentUser(authentication);
+                getCurrentUser(
+                        authentication
+                );
 
         if (owner == null) {
             return "redirect:/vendor";
@@ -232,24 +273,118 @@ public class VendorOrderController {
             orderService.cancelOrder(
                     orderId,
                     shopId,
-                    owner.getId());
+                    owner.getId()
+            );
 
             redirectAttributes
                     .addFlashAttribute(
                             "successMessage",
-                            "Đã hủy đơn hàng.");
+                            "Đã hủy đơn hàng."
+                    );
 
         } catch (IllegalArgumentException e) {
 
             redirectAttributes
                     .addFlashAttribute(
                             "errorMessage",
-                            e.getMessage());
+                            e.getMessage()
+                    );
         }
 
         return redirectToDetail(
                 shopId,
-                orderId);
+                orderId
+        );
+    }
+
+    @PostMapping("/{orderId}/returned")
+    public String markReturned(
+            @PathVariable Long shopId,
+            @PathVariable Long orderId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        User owner =
+                getCurrentUser(
+                        authentication
+                );
+
+        if (owner == null) {
+            return "redirect:/vendor";
+        }
+
+        try {
+
+            orderService.markReturned(
+                    orderId,
+                    shopId,
+                    owner.getId()
+            );
+
+            redirectAttributes
+                    .addFlashAttribute(
+                            "successMessage",
+                            "Đã xác nhận nhận lại hàng và cập nhật tồn kho."
+                    );
+
+        } catch (IllegalArgumentException e) {
+
+            redirectAttributes
+                    .addFlashAttribute(
+                            "errorMessage",
+                            e.getMessage()
+                    );
+        }
+
+        return redirectToDetail(
+                shopId,
+                orderId
+        );
+    }
+
+    @PostMapping("/{orderId}/refund")
+    public String refundOrder(
+            @PathVariable Long shopId,
+            @PathVariable Long orderId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        User owner =
+                getCurrentUser(
+                        authentication
+                );
+
+        if (owner == null) {
+            return "redirect:/vendor";
+        }
+
+        try {
+
+            orderService.refundOrder(
+                    orderId,
+                    shopId,
+                    owner.getId()
+            );
+
+            redirectAttributes
+                    .addFlashAttribute(
+                            "successMessage",
+                            "Đơn hàng đã được hoàn tiền."
+                    );
+
+        } catch (IllegalArgumentException e) {
+
+            redirectAttributes
+                    .addFlashAttribute(
+                            "errorMessage",
+                            e.getMessage()
+                    );
+        }
+
+        return redirectToDetail(
+                shopId,
+                orderId
+        );
     }
 
     private String redirectToDetail(
@@ -267,13 +402,15 @@ public class VendorOrderController {
 
         if (status == null
                 || status.isBlank()) {
+
             return null;
         }
 
         try {
 
             return OrderStatus.valueOf(
-                    status);
+                    status
+            );
 
         } catch (IllegalArgumentException e) {
 
@@ -285,14 +422,15 @@ public class VendorOrderController {
             Authentication authentication) {
 
         if (authentication == null
-                || !authentication
-                        .isAuthenticated()) {
+                || !authentication.isAuthenticated()) {
+
             return null;
         }
 
         return userRepository
                 .findByEmail(
-                        authentication.getName())
+                        authentication.getName()
+                )
                 .orElse(null);
     }
 }

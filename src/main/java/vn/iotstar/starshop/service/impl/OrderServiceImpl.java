@@ -14,9 +14,13 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.entity.Order;
 import vn.iotstar.starshop.entity.OrderDetail;
+import vn.iotstar.starshop.entity.Product;
 import vn.iotstar.starshop.enums.OrderStatus;
+import vn.iotstar.starshop.enums.PaymentStatus;
+import vn.iotstar.starshop.enums.ProductStatus;
 import vn.iotstar.starshop.repository.OrderDetailRepository;
 import vn.iotstar.starshop.repository.OrderRepository;
+import vn.iotstar.starshop.repository.ProductRepository;
 import vn.iotstar.starshop.service.OrderService;
 
 @Service
@@ -25,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final ProductRepository productRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -37,11 +42,13 @@ public class OrderServiceImpl implements OrderService {
             int size) {
 
         Pageable pageable = PageRequest.of(
-                page,
-                size,
+                Math.max(page, 0),
+                Math.max(size, 1),
                 Sort.by(
                         Sort.Direction.DESC,
-                        "createdAt"));
+                        "createdAt"
+                )
+        );
 
         Specification<Order> specification =
                 (root, query, cb) -> {
@@ -53,7 +60,9 @@ public class OrderServiceImpl implements OrderService {
                             predicate,
                             cb.equal(
                                     root.get("shop").get("id"),
-                                    shopId));
+                                    shopId
+                            )
+                    );
 
                     predicate = cb.and(
                             predicate,
@@ -61,36 +70,41 @@ public class OrderServiceImpl implements OrderService {
                                     root.get("shop")
                                             .get("owner")
                                             .get("id"),
-                                    ownerId));
+                                    ownerId
+                            )
+                    );
 
                     if (keyword != null
                             && !keyword.isBlank()) {
 
                         String search =
                                 "%"
-                                + keyword.trim()
-                                        .toLowerCase()
+                                + keyword.trim().toLowerCase()
                                 + "%";
 
                         Predicate receiverName =
                                 cb.like(
                                         cb.lower(
-                                                root.get(
-                                                        "receiverName")),
-                                        search);
+                                                root.get("receiverName")
+                                        ),
+                                        search
+                                );
 
                         Predicate receiverPhone =
                                 cb.like(
                                         cb.lower(
-                                                root.get(
-                                                        "receiverPhone")),
-                                        search);
+                                                root.get("receiverPhone")
+                                        ),
+                                        search
+                                );
 
                         predicate = cb.and(
                                 predicate,
                                 cb.or(
                                         receiverName,
-                                        receiverPhone));
+                                        receiverPhone
+                                )
+                        );
                     }
 
                     if (status != null) {
@@ -99,7 +113,9 @@ public class OrderServiceImpl implements OrderService {
                                 predicate,
                                 cb.equal(
                                         root.get("status"),
-                                        status));
+                                        status
+                                )
+                        );
                     }
 
                     return predicate;
@@ -107,7 +123,8 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findAll(
                 specification,
-                pageable);
+                pageable
+        );
     }
 
     @Override
@@ -121,10 +138,13 @@ public class OrderServiceImpl implements OrderService {
                 .findByIdAndShopIdAndShopOwnerId(
                         orderId,
                         shopId,
-                        ownerId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Không tìm thấy đơn hàng."));
+                        ownerId
+                )
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "Không tìm thấy đơn hàng."
+                        )
+                );
     }
 
     @Override
@@ -134,7 +154,8 @@ public class OrderServiceImpl implements OrderService {
 
         return orderDetailRepository
                 .findByOrderIdOrderByIdAsc(
-                        orderId);
+                        orderId
+                );
     }
 
     @Override
@@ -147,17 +168,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderByOwner(
                 orderId,
                 shopId,
-                ownerId);
+                ownerId
+        );
 
         if (order.getStatus()
                 != OrderStatus.NEW) {
 
             throw new IllegalArgumentException(
-                    "Chỉ đơn hàng NEW mới có thể xác nhận.");
+                    "Chỉ đơn hàng NEW mới có thể xác nhận."
+            );
         }
 
         order.setStatus(
-                OrderStatus.CONFIRMED);
+                OrderStatus.CONFIRMED
+        );
 
         orderRepository.save(order);
     }
@@ -172,17 +196,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderByOwner(
                 orderId,
                 shopId,
-                ownerId);
+                ownerId
+        );
 
         if (order.getStatus()
                 != OrderStatus.CONFIRMED) {
 
             throw new IllegalArgumentException(
-                    "Chỉ đơn hàng CONFIRMED mới có thể chuyển sang READY_FOR_PICKUP.");
+                    "Chỉ đơn hàng CONFIRMED mới có thể chuyển sang READY_FOR_PICKUP."
+            );
         }
 
         order.setStatus(
-                OrderStatus.READY_FOR_PICKUP);
+                OrderStatus.READY_FOR_PICKUP
+        );
 
         orderRepository.save(order);
     }
@@ -197,7 +224,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderByOwner(
                 orderId,
                 shopId,
-                ownerId);
+                ownerId
+        );
 
         if (order.getStatus()
                 != OrderStatus.NEW
@@ -205,12 +233,108 @@ public class OrderServiceImpl implements OrderService {
                 != OrderStatus.CONFIRMED) {
 
             throw new IllegalArgumentException(
-                    "Chỉ đơn NEW hoặc CONFIRMED mới có thể hủy.");
+                    "Chỉ đơn NEW hoặc CONFIRMED mới có thể hủy."
+            );
         }
 
         order.setStatus(
-                OrderStatus.CANCELLED);
+                OrderStatus.CANCELLED
+        );
 
         orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void markReturned(
+            Long orderId,
+            Long shopId,
+            Long ownerId) {
+
+        Order order = getOrderByOwner(
+                orderId,
+                shopId,
+                ownerId
+        );
+
+        if (order.getStatus()
+                != OrderStatus.RETURN_REQUESTED) {
+
+            throw new IllegalArgumentException(
+                    "Chỉ đơn đang yêu cầu trả hàng mới có thể xác nhận đã nhận lại hàng."
+            );
+        }
+
+        List<OrderDetail> orderDetails =
+                orderDetailRepository
+                        .findByOrderIdOrderByIdAsc(
+                                orderId
+                        );
+
+        for (OrderDetail detail : orderDetails) {
+
+            Product product =
+                    detail.getProduct();
+
+            product.setQuantity(
+                    product.getQuantity()
+                    + detail.getQuantity()
+            );
+
+            if (product.getStatus()
+                    == ProductStatus.OUT_OF_STOCK
+                    && product.getQuantity() > 0) {
+
+                product.setStatus(
+                        ProductStatus.ACTIVE
+                );
+            }
+
+            productRepository.save(
+                    product
+            );
+        }
+
+        order.setStatus(
+                OrderStatus.RETURNED
+        );
+
+        orderRepository.save(
+                order
+        );
+    }
+
+    @Override
+    @Transactional
+    public void refundOrder(
+            Long orderId,
+            Long shopId,
+            Long ownerId) {
+
+        Order order = getOrderByOwner(
+                orderId,
+                shopId,
+                ownerId
+        );
+
+        if (order.getStatus()
+                != OrderStatus.RETURNED) {
+
+            throw new IllegalArgumentException(
+                    "Chỉ đơn đã nhận lại hàng mới có thể hoàn tiền."
+            );
+        }
+
+        order.setStatus(
+                OrderStatus.REFUNDED
+        );
+
+        order.setPaymentStatus(
+                PaymentStatus.REFUNDED
+        );
+
+        orderRepository.save(
+                order
+        );
     }
 }

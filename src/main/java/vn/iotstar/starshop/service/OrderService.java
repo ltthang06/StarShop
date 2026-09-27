@@ -16,27 +16,46 @@ public interface OrderService {
             String keyword,
             OrderStatus status,
             int page,
-            int size);
+            int size
+    );
 
     Order getOrderByOwner(
             Long orderId,
             Long shopId,
-            Long ownerId);
+            Long ownerId
+    );
 
-    List<OrderDetail> getOrderDetails(Long orderId);
+    List<OrderDetail> getOrderDetails(
+            Long orderId
+    );
 
     void confirmOrder(
             Long orderId,
             Long shopId,
-            Long ownerId);
+            Long ownerId
+    );
 
     void markReadyForPickup(
             Long orderId,
             Long shopId,
-            Long ownerId);
+            Long ownerId
+    );
 
     void cancelOrder(
             Long orderId,
             Long shopId,
-            Long ownerId);
+            Long ownerId
+    );
+
+    void markReturned(
+            Long orderId,
+            Long shopId,
+            Long ownerId
+    );
+
+    void refundOrder(
+            Long orderId,
+            Long shopId,
+            Long ownerId
+    );
 }
