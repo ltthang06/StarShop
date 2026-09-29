@@ -15,11 +15,11 @@
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div><h1 class="h3 mb-1">Bảng điều khiển</h1><p class="text-muted mb-0">Khu vực quản lý hệ thống</p></div>
-        <a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/categories">Quản lý danh mục</a>
+        <div class="d-flex gap-2"><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/categories">Danh mục</a><a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/shops">Cửa hàng</a></div>
     </div>
     <div class="row g-3">
         <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Danh mục</div><div class="display-6">${categoryCount}</div></div></div></div>
-        <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Shop chờ duyệt</div><div class="display-6">-</div><small class="text-muted">Sẽ nối với module Shop ở đợt tiếp theo</small></div></div></div>
+        <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Shop chờ duyệt</div><div class="display-6">${pendingShopCount}</div><a href="${pageContext.request.contextPath}/manager/shops?status=PENDING">Xem danh sách</a></div></div></div>
         <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Đơn hàng</div><div class="display-6">-</div><small class="text-muted">Sẽ nối với module Order ở đợt tích hợp</small></div></div></div>
     </div>
 </main>

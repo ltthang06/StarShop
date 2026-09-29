@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.service.CategoryService;
+import vn.iotstar.starshop.service.ManagerShopService;
 
 @Controller
 @RequiredArgsConstructor
@@ -14,10 +15,12 @@ import vn.iotstar.starshop.service.CategoryService;
 public class ManagerDashboardController {
 
     private final CategoryService categoryService;
+    private final ManagerShopService shopService;
 
     @GetMapping
     public String dashboard(Model model) {
         model.addAttribute("categoryCount", categoryService.count());
+        model.addAttribute("pendingShopCount", shopService.countPending());
         return "manager/dashboard";
     }
 }

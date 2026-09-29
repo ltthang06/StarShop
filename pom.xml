@@ -16,6 +16,7 @@
     <groupId>vn.iotstar</groupId>
     <artifactId>starshop</artifactId>
     <version>1.0</version>
+    <packaging>war</packaging>
 
     <name>StarShop</name>
     <description>StarShop Flower E-commerce Website</description>
@@ -94,6 +95,12 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
 

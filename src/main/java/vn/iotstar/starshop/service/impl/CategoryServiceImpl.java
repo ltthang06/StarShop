@@ -42,8 +42,15 @@ public class CategoryServiceImpl implements CategoryService {
         if (duplicated) {
             throw new IllegalArgumentException("Tên danh mục đã tồn tại");
         }
-        category.setName(normalizedName);
-        return categoryRepository.save(category);
+        Category saved = category.getId() == null ? new Category() : findById(category.getId());
+        saved.setName(normalizedName);
+        saved.setDescription(category.getDescription());
+        saved.setActive(category.isActive());
+        // The current form does not edit images; keep the image already stored.
+        if (category.getId() == null) {
+            saved.setImage(category.getImage());
+        }
+        return categoryRepository.save(saved);
     }
 
     @Override
