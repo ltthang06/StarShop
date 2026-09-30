@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -74,20 +75,37 @@
 
                 <tr>
                     <th>Ngày tạo</th>
-                    <td>${shop.createdAt}</td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${not empty shop.createdAt}">
+                                <fmt:formatNumber value="${shop.createdAt.dayOfMonth}" pattern="00"/>/<fmt:formatNumber value="${shop.createdAt.monthValue}" pattern="00"/>/${shop.createdAt.year}
+                                <fmt:formatNumber value="${shop.createdAt.hour}" pattern="00"/>:<fmt:formatNumber value="${shop.createdAt.minute}" pattern="00"/>:<fmt:formatNumber value="${shop.createdAt.second}" pattern="00"/>
+                            </c:when>
+                            <c:otherwise>
+                                -
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
                 </tr>
 
             </table>
 
-            <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/edit"
-               class="btn btn-primary">
-                Chỉnh sửa
-            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/edit"
+                   class="btn btn-primary">
+                    Chỉnh sửa
+                </a>
 
-            <a href="${pageContext.request.contextPath}/vendor/shops"
-               class="btn btn-secondary">
-                Quay lại
-            </a>
+                <a href="${pageContext.request.contextPath}/vendor/shops"
+                   class="btn btn-secondary">
+                    Quay lại
+                </a>
+
+                <a href="${pageContext.request.contextPath}/vendor/dashboard"
+                   class="btn btn-outline-dark">
+                    Dashboard
+                </a>
+            </div>
 
         </div>
 

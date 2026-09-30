@@ -21,7 +21,14 @@
             <div class="card shadow-sm">
                 <div class="card-body p-4">
 
-                    <h2 class="mb-4">Đăng ký cửa hàng</h2>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                        <h2 class="mb-0">Đăng ký cửa hàng</h2>
+
+                        <a href="${pageContext.request.contextPath}/vendor/shops"
+                           class="btn btn-outline-secondary">
+                            Quay lại cửa hàng
+                        </a>
+                    </div>
 
                     <c:if test="${not empty successMessage}">
                         <div class="alert alert-success">
@@ -109,9 +116,22 @@
                                    class="form-control">
                         </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            Đăng ký cửa hàng
-                        </button>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Đăng ký cửa hàng
+                            </button>
+
+                            <a href="${pageContext.request.contextPath}/vendor/shops"
+                               class="btn btn-secondary">
+                                Hủy
+                            </a>
+
+                            <a href="${pageContext.request.contextPath}/vendor/dashboard"
+                               class="btn btn-outline-dark">
+                                Quay lại Dashboard
+                            </a>
+                        </div>
 
                     </form>
 

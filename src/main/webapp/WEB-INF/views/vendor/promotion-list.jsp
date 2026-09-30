@@ -32,6 +32,7 @@
 
         <div>
             <h2>Quản lý khuyến mãi</h2>
+
             <div class="text-muted">
                 ${shop.name}
             </div>
@@ -188,15 +189,20 @@
 
                         <td>
 
-                            ${fn:replace(
-                                fn:substring(
-                                    promotion.startAt,
-                                    0,
-                                    16
-                                ),
-                                'T',
-                                ' '
-                            )}
+                            <c:choose>
+
+                                <c:when test="${not empty promotion.startAt}">
+
+                                    ${fn:substring(promotion.startAt, 8, 10)}/${fn:substring(promotion.startAt, 5, 7)}/${fn:substring(promotion.startAt, 0, 4)}
+                                    ${fn:substring(promotion.startAt, 11, 16)}
+
+                                </c:when>
+
+                                <c:otherwise>
+                                    -
+                                </c:otherwise>
+
+                            </c:choose>
 
                             <br>
 
@@ -204,15 +210,20 @@
 
                             <br>
 
-                            ${fn:replace(
-                                fn:substring(
-                                    promotion.endAt,
-                                    0,
-                                    16
-                                ),
-                                'T',
-                                ' '
-                            )}
+                            <c:choose>
+
+                                <c:when test="${not empty promotion.endAt}">
+
+                                    ${fn:substring(promotion.endAt, 8, 10)}/${fn:substring(promotion.endAt, 5, 7)}/${fn:substring(promotion.endAt, 0, 4)}
+                                    ${fn:substring(promotion.endAt, 11, 16)}
+
+                                </c:when>
+
+                                <c:otherwise>
+                                    -
+                                </c:otherwise>
+
+                            </c:choose>
 
                         </td>
 

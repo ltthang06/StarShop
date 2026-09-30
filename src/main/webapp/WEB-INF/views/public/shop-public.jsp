@@ -403,127 +403,158 @@
 
         </c:if>
 
-        <c:if test="${not empty shopData.bestSellers}">
+        <c:set var="hasBestSeller"
+               value="false"/>
 
-            <div class="mb-5">
+        <c:forEach items="${shopData.bestSellers}"
+                   var="bestSellerCheck">
 
-                <h3 class="mb-3">
-                    Sản phẩm bán chạy
-                </h3>
+            <c:if test="${bestSellerCheck.soldCount > 0}">
 
-                <div class="row g-3">
+                <c:set var="hasBestSeller"
+                       value="true"/>
 
-                    <c:forEach
-                            items="${shopData.bestSellers}"
-                            var="product">
+            </c:if>
 
-                        <div class="col-md-6 col-lg-3">
+        </c:forEach>
 
-                            <div class="card product-card shadow-sm h-100">
+        <div class="mb-5">
 
-                                <c:choose>
+            <h3 class="mb-3">
+                Sản phẩm bán chạy
+            </h3>
 
-                                    <c:when test="${not empty product.imageUrl}">
+            <c:choose>
 
-                                        <img src="${product.imageUrl}"
-                                             class="product-image card-img-top"
-                                             alt="${product.name}">
+                <c:when test="${hasBestSeller}">
 
-                                    </c:when>
+                    <div class="row g-3">
 
-                                    <c:otherwise>
+                        <c:forEach
+                                items="${shopData.bestSellers}"
+                                var="product">
 
-                                        <div class="product-image-empty">
-                                            Chưa có ảnh
+                            <c:if test="${product.soldCount > 0}">
+
+                                <div class="col-md-6 col-lg-3">
+
+                                    <div class="card product-card shadow-sm h-100">
+
+                                        <c:choose>
+
+                                            <c:when test="${not empty product.imageUrl}">
+
+                                                <img src="${product.imageUrl}"
+                                                     class="product-image card-img-top"
+                                                     alt="${product.name}">
+
+                                            </c:when>
+
+                                            <c:otherwise>
+
+                                                <div class="product-image-empty">
+                                                    Chưa có ảnh
+                                                </div>
+
+                                            </c:otherwise>
+
+                                        </c:choose>
+
+                                        <div class="card-body">
+
+                                            <div class="small text-muted">
+                                                ${product.categoryName}
+                                            </div>
+
+                                            <h5 class="mt-1">
+                                                ${product.name}
+                                            </h5>
+
+                                            <div class="mb-2">
+
+                                                ⭐
+
+                                                <fmt:formatNumber
+                                                        value="${product.rating}"
+                                                        maxFractionDigits="1"/>
+
+                                                · Đã bán
+                                                ${product.soldCount}
+
+                                            </div>
+
+                                            <c:choose>
+
+                                                <c:when test="${not empty product.discountPrice
+                                                        && product.discountPrice > 0
+                                                        && product.discountPrice < product.price}">
+
+                                                    <div class="fw-bold text-danger fs-5">
+
+                                                        <fmt:formatNumber
+                                                                value="${product.discountPrice}"
+                                                                groupingUsed="true"
+                                                                maxFractionDigits="0"/>
+
+                                                        VNĐ
+
+                                                    </div>
+
+                                                    <div class="old-price">
+
+                                                        <fmt:formatNumber
+                                                                value="${product.price}"
+                                                                groupingUsed="true"
+                                                                maxFractionDigits="0"/>
+
+                                                        VNĐ
+
+                                                    </div>
+
+                                                </c:when>
+
+                                                <c:otherwise>
+
+                                                    <div class="fw-bold fs-5">
+
+                                                        <fmt:formatNumber
+                                                                value="${product.price}"
+                                                                groupingUsed="true"
+                                                                maxFractionDigits="0"/>
+
+                                                        VNĐ
+
+                                                    </div>
+
+                                                </c:otherwise>
+
+                                            </c:choose>
+
                                         </div>
 
-                                    </c:otherwise>
-
-                                </c:choose>
-
-                                <div class="card-body">
-
-                                    <div class="small text-muted">
-                                        ${product.categoryName}
                                     </div>
-
-                                    <h5 class="mt-1">
-                                        ${product.name}
-                                    </h5>
-
-                                    <div class="mb-2">
-
-                                        ⭐
-
-                                        <fmt:formatNumber
-                                                value="${product.rating}"
-                                                maxFractionDigits="1"/>
-
-                                        · Đã bán
-                                        ${product.soldCount}
-
-                                    </div>
-
-                                    <c:choose>
-
-                                        <c:when test="${not empty product.discountPrice
-                                                && product.discountPrice > 0
-                                                && product.discountPrice < product.price}">
-
-                                            <div class="fw-bold text-danger fs-5">
-
-                                                <fmt:formatNumber
-                                                        value="${product.discountPrice}"
-                                                        groupingUsed="true"
-                                                        maxFractionDigits="0"/>
-
-                                                VNĐ
-
-                                            </div>
-
-                                            <div class="old-price">
-
-                                                <fmt:formatNumber
-                                                        value="${product.price}"
-                                                        groupingUsed="true"
-                                                        maxFractionDigits="0"/>
-
-                                                VNĐ
-
-                                            </div>
-
-                                        </c:when>
-
-                                        <c:otherwise>
-
-                                            <div class="fw-bold fs-5">
-
-                                                <fmt:formatNumber
-                                                        value="${product.price}"
-                                                        groupingUsed="true"
-                                                        maxFractionDigits="0"/>
-
-                                                VNĐ
-
-                                            </div>
-
-                                        </c:otherwise>
-
-                                    </c:choose>
 
                                 </div>
 
-                            </div>
+                            </c:if>
 
-                        </div>
+                        </c:forEach>
 
-                    </c:forEach>
+                    </div>
 
-                </div>
+                </c:when>
 
-            </div>
+                <c:otherwise>
 
-        </c:if>
+                    <div class="alert alert-info mb-0">
+                        Chưa có dữ liệu bán hàng.
+                    </div>
+
+                </c:otherwise>
+
+            </c:choose>
+
+        </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
 

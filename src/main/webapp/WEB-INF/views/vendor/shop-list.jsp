@@ -16,13 +16,20 @@
 
 <div class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Cửa hàng của tôi</h2>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">Cửa hàng của tôi</h2>
 
-        <a href="${pageContext.request.contextPath}/vendor/shop/register"
-           class="btn btn-primary">
-            Đăng ký cửa hàng
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="${pageContext.request.contextPath}/vendor/dashboard"
+               class="btn btn-outline-dark">
+                Quay lại Dashboard
+            </a>
+
+            <a href="${pageContext.request.contextPath}/vendor/shop/register"
+               class="btn btn-primary">
+                Đăng ký cửa hàng
+            </a>
+        </div>
     </div>
 
     <c:if test="${not empty errorMessage}">
@@ -45,7 +52,7 @@
 
                 <div class="card h-100 shadow-sm">
 
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
 
                         <h4 class="card-title">
                             ${shop.name}
@@ -60,15 +67,47 @@
                             ${shop.description}
                         </p>
 
-                        <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}"
-                           class="btn btn-outline-primary">
-                            Xem chi tiết
-                        </a>
+                        <div class="mt-auto">
 
-                        <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/edit"
-                           class="btn btn-outline-secondary">
-                            Chỉnh sửa
-                        </a>
+                            <div class="d-flex gap-2 flex-wrap mb-2">
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}"
+                                   class="btn btn-outline-primary">
+                                    Xem chi tiết
+                                </a>
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/edit"
+                                   class="btn btn-outline-secondary">
+                                    Chỉnh sửa
+                                </a>
+
+                            </div>
+
+                            <div class="d-flex gap-2 flex-wrap">
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/products"
+                                   class="btn btn-sm btn-outline-success">
+                                    Sản phẩm
+                                </a>
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/orders"
+                                   class="btn btn-sm btn-outline-warning">
+                                    Đơn hàng
+                                </a>
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/promotions"
+                                   class="btn btn-sm btn-outline-info">
+                                    Khuyến mãi
+                                </a>
+
+                                <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/statistics"
+                                   class="btn btn-sm btn-outline-dark">
+                                    Thống kê
+                                </a>
+
+                            </div>
+
+                        </div>
 
                     </div>
 

@@ -109,13 +109,13 @@
                     <th>
                         Tổng tiền
                     </th>
-                    <td>              
-                    		<fmt:formatNumber
-                    			value="${order.totalAmount}"
-                    			type="number"
-                    			maxFractionDigits="0"
-                    			groupingUsed="true" />
-                    		VNĐ                   
+                    <td>
+                        <fmt:formatNumber
+                                value="${order.totalAmount}"
+                                type="number"
+                                maxFractionDigits="0"
+                                groupingUsed="true" />
+                        VNĐ
                     </td>
                 </tr>
 
@@ -159,11 +159,17 @@
 
             </table>
 
-            <hr>
+            <c:if test="${order.status eq 'ASSIGNED'
+                        or order.status eq 'PICKED_UP'
+                        or order.status eq 'SHIPPING'}">
 
-            <h5 class="mb-3">
-                Cập nhật giao hàng
-            </h5>
+                <hr>
+
+                <h5 class="mb-3">
+                    Cập nhật giao hàng
+                </h5>
+
+            </c:if>
 
             <c:if test="${order.status eq 'ASSIGNED'}">
 
@@ -211,7 +217,7 @@
 
             <c:if test="${order.status eq 'SHIPPING'}">
 
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap">
 
                     <form method="post"
                           action="${pageContext.request.contextPath}/shipper/orders/${assignment.id}/status">
@@ -255,7 +261,7 @@
 
             <c:if test="${order.status eq 'DELIVERED'}">
 
-                <div class="alert alert-success mb-0">
+                <div class="alert alert-success mb-0 mt-3">
                     Đơn hàng đã giao thành công.
                 </div>
 
@@ -263,8 +269,24 @@
 
             <c:if test="${order.status eq 'DELIVERY_FAILED'}">
 
-                <div class="alert alert-danger mb-0">
+                <div class="alert alert-danger mb-0 mt-3">
                     Đơn hàng giao thất bại.
+                </div>
+
+            </c:if>
+
+            <c:if test="${order.status eq 'REFUNDED'}">
+
+                <div class="alert alert-secondary mb-0 mt-3">
+                    Đơn hàng đã hoàn tiền. Không còn thao tác giao hàng.
+                </div>
+
+            </c:if>
+
+            <c:if test="${order.status eq 'CANCELLED'}">
+
+                <div class="alert alert-secondary mb-0 mt-3">
+                    Đơn hàng đã bị hủy. Không còn thao tác giao hàng.
                 </div>
 
             </c:if>
