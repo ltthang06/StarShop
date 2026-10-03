@@ -13,6 +13,7 @@
         <span class="text-white-50">Manager / Admin</span></div>
 </nav>
 <main class="container py-4">
+    <div class="d-flex gap-2 flex-wrap mb-3"><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/users">Người dùng</a><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/shipping-providers">Đơn vị vận chuyển</a><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/orders">Đơn hàng / Phân công</a></div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div><h1 class="h3 mb-1">Bảng điều khiển</h1><p class="text-muted mb-0">Khu vực quản lý hệ thống</p></div>
         <div class="d-flex gap-2"><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/categories">Danh mục</a><a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/shops">Cửa hàng</a></div>
