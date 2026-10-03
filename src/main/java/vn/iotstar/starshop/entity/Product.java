@@ -20,10 +20,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 200, columnDefinition = "nvarchar(200)")
     private String name;
 
-    @Column(nullable = false, length = 2000)
+    @Column(nullable = false, length = 2000, columnDefinition = "nvarchar(2000)")
     private String description;
 
     @Column(nullable = false, precision = 15, scale = 2)
