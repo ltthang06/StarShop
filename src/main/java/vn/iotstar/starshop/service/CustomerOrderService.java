@@ -22,6 +22,7 @@ import vn.iotstar.starshop.enums.ProductStatus;
 import vn.iotstar.starshop.repository.CustomerCatalogRepository;
 import vn.iotstar.starshop.repository.CustomerOrderRepository;
 import vn.iotstar.starshop.repository.OrderDetailRepository;
+import vn.iotstar.starshop.repository.CustomerReviewRepository;
 import vn.iotstar.starshop.repository.UserRepository;
 
 @Service
@@ -35,6 +36,7 @@ public class CustomerOrderService {
     private final CustomerOrderRepository orderRepository;
     private final OrderDetailRepository detailRepository;
     private final CustomerCatalogRepository productRepository;
+    private final CustomerReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
     public Page<CustomerOrderCard> history(String email, int page) {
@@ -81,9 +83,14 @@ public class CustomerOrderService {
                 .findByOrderIdOrderByIdAsc(order.getId())
                 .stream()
                 .map(detail -> new CustomerOrderLine(
+                        detail.getId(),
+                        detail.getProduct().getId(),
                         detail.getProduct().getName(),
                         detail.getQuantity(),
-                        detail.getSubtotal()))
+                        detail.getSubtotal(),
+                        order.getStatus() == OrderStatus.DELIVERED
+                                && !reviewRepository.existsByOrderDetailId(
+                                        detail.getId())))
                 .toList();
 
         return new CustomerOrderCard(

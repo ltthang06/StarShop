@@ -67,6 +67,42 @@
             </form>
         </div>
     </div>
+
+    <section class="mt-5">
+        <h2 class="section-title">Đánh giá của khách hàng</h2>
+        <c:choose>
+            <c:when test="${empty reviews}">
+                <p class="text-muted">Sản phẩm chưa có đánh giá.</p>
+            </c:when>
+            <c:otherwise>
+                <c:forEach var="review" items="${reviews}">
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong><c:out value="${review.author}"/></strong>
+                                <span class="text-muted">${review.createdAt}</span>
+                            </div>
+                            <p class="text-warning mb-2">${review.rating}/5 sao</p>
+                            <p style="white-space: pre-line">
+                                <c:out value="${review.content}"/>
+                            </p>
+                            <c:if test="${not empty review.imageUrl}">
+                                <img class="img-fluid rounded mb-2"
+                                     src="<c:out value='${review.imageUrl}'/>"
+                                     alt="Ảnh đánh giá" style="max-height: 300px">
+                            </c:if>
+                            <c:if test="${not empty review.videoUrl}">
+                                <video class="w-100" controls style="max-height: 360px">
+                                    <source src="<c:out value='${review.videoUrl}'/>"
+                                            type="video/mp4">
+                                </video>
+                            </c:if>
+                        </div>
+                    </div>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
+    </section>
 </main>
 
 <%@ include file="../common/footer.jsp" %>

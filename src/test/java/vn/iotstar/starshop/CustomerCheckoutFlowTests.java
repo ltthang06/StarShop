@@ -1,6 +1,7 @@
 package vn.iotstar.starshop;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,11 +28,13 @@ import vn.iotstar.starshop.repository.CustomerCatalogRepository;
 import vn.iotstar.starshop.repository.CustomerShippingProviderRepository;
 import vn.iotstar.starshop.repository.OrderDetailRepository;
 import vn.iotstar.starshop.repository.OrderRepository;
+import vn.iotstar.starshop.repository.CustomerReviewRepository;
 import vn.iotstar.starshop.repository.ShopRepository;
 import vn.iotstar.starshop.repository.UserRepository;
 import vn.iotstar.starshop.service.CustomerCartService;
 import vn.iotstar.starshop.service.CustomerCheckoutService;
 import vn.iotstar.starshop.service.CustomerOrderService;
+import vn.iotstar.starshop.service.CustomerReviewService;
 
 @SpringBootTest
 class CustomerCheckoutFlowTests {
@@ -69,8 +72,14 @@ class CustomerCheckoutFlowTests {
     @Autowired
     private CustomerOrderService customerOrderService;
 
+    @Autowired
+    private CustomerReviewService reviewService;
+
+    @Autowired
+    private CustomerReviewRepository reviewRepository;
+
     @Test
-    void checkoutSplitsOrdersByShopAndReservesStock() {
+    void checkoutSplitsOrdersByShopAndReservesStock() throws Exception {
         User customer = createUser("checkout@example.com", "0900000021");
         User firstVendor = createUser("vendor-one@example.com", "0900000022");
         User secondVendor = createUser("vendor-two@example.com", "0900000023");
@@ -134,6 +143,22 @@ class CustomerCheckoutFlowTests {
                 orderIds.get(1)).orElseThrow();
         delivered.setStatus(OrderStatus.DELIVERED);
         orderRepository.save(delivered);
+
+        Long detailId = detailRepository.findByOrderIdOrderByIdAsc(
+                delivered.getId()).get(0).getId();
+        String reviewText = "Hoa rất tươi, đóng gói cẩn thận và giao đúng hẹn. "
+                + "Tôi sẽ tiếp tục mua lần sau.";
+        reviewService.submit(customer.getEmail(), delivered.getId(),
+                detailId, 5, reviewText, null, null);
+        assertThat(reviewRepository.existsByOrderDetailId(detailId))
+                .isTrue();
+        assertThat(productRepository.findById(second.getId()).orElseThrow()
+                .getRating()).isEqualTo(5);
+        assertThatThrownBy(() -> reviewService.submit(
+                customer.getEmail(), delivered.getId(), detailId,
+                5, reviewText, null, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
         customerOrderService.requestReturn(customer.getEmail(),
                 delivered.getId());
         assertThat(orderRepository.findById(delivered.getId()).orElseThrow()

@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.service.CustomerCatalogService;
 import vn.iotstar.starshop.service.CustomerActivityService;
+import vn.iotstar.starshop.service.CustomerReviewService;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class CustomerProductController {
 
     private final CustomerCatalogService catalogService;
     private final CustomerActivityService activityService;
+    private final CustomerReviewService reviewService;
 
     @GetMapping({"/products", "/products/search"})
     public String list(
@@ -45,6 +47,7 @@ public class CustomerProductController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Không tìm thấy sản phẩm")));
+        model.addAttribute("reviews", reviewService.reviews(id));
         if (authentication != null
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
             activityService.recordView(authentication.getName(), id);

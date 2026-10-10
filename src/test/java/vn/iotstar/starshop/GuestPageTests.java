@@ -26,11 +26,13 @@ import vn.iotstar.starshop.entity.Role;
 import vn.iotstar.starshop.entity.Address;
 import vn.iotstar.starshop.entity.Category;
 import vn.iotstar.starshop.entity.Product;
+import vn.iotstar.starshop.entity.Order;
 import vn.iotstar.starshop.entity.ShippingProvider;
 import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.entity.User;
 import vn.iotstar.starshop.enums.RoleName;
 import vn.iotstar.starshop.enums.ShopStatus;
+import vn.iotstar.starshop.enums.OrderStatus;
 import vn.iotstar.starshop.enums.UserStatus;
 import vn.iotstar.starshop.repository.RoleRepository;
 import vn.iotstar.starshop.repository.CategoryRepository;
@@ -38,8 +40,12 @@ import vn.iotstar.starshop.repository.CustomerAddressRepository;
 import vn.iotstar.starshop.repository.CustomerCatalogRepository;
 import vn.iotstar.starshop.repository.CustomerShippingProviderRepository;
 import vn.iotstar.starshop.repository.ShopRepository;
+import vn.iotstar.starshop.repository.OrderDetailRepository;
+import vn.iotstar.starshop.repository.OrderRepository;
 import vn.iotstar.starshop.repository.UserRepository;
 import vn.iotstar.starshop.service.CustomerCartService;
+import vn.iotstar.starshop.service.CustomerCheckoutService;
+import vn.iotstar.starshop.service.CustomerReviewService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GuestPageTests {
@@ -79,6 +85,18 @@ class GuestPageTests {
 
     @Autowired
     private CustomerCartService cartService;
+
+    @Autowired
+    private CustomerCheckoutService checkoutService;
+
+    @Autowired
+    private CustomerReviewService reviewService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderDetailRepository detailRepository;
 
     @Test
     void publicPagesRender() throws Exception {
@@ -151,12 +169,12 @@ class GuestPageTests {
         address.setPhone("0900000099");
         address.setAddressLine("Số 1 Đường Hoa");
         address.setDefaultAddress(true);
-        addressRepository.save(address);
+        address = addressRepository.save(address);
 
         ShippingProvider provider = new ShippingProvider();
         provider.setName("Giao hàng kiểm tra trang");
         provider.setBaseFee(BigDecimal.valueOf(15000));
-        providerRepository.save(provider);
+        provider = providerRepository.save(provider);
 
         HttpClient client = HttpClient.newBuilder()
                 .cookieHandler(new CookieManager(null,
@@ -201,5 +219,39 @@ class GuestPageTests {
                     .as(path + ": " + response.body())
                     .isEqualTo(200);
         }
+
+        Long orderId = checkoutService.placeOrder(
+                user.getEmail(), address.getId(), provider.getId(), null)
+                .get(0);
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepository.save(order);
+        Long detailId = detailRepository.findByOrderIdOrderByIdAsc(
+                orderId).get(0).getId();
+
+        String reviewPath = "/orders/" + orderId
+                + "/items/" + detailId + "/review";
+        HttpResponse<String> reviewPage = client.send(
+                HttpRequest.newBuilder(URI.create(
+                        "http://localhost:" + port + reviewPath))
+                        .GET().build(),
+                HttpResponse.BodyHandlers.ofString()
+        );
+        assertThat(reviewPage.statusCode())
+                .as(reviewPage.body()).isEqualTo(200);
+
+        reviewService.submit(user.getEmail(), orderId, detailId, 5,
+                "Sản phẩm đẹp, đóng gói kỹ và giao hàng đúng hẹn. "
+                        + "Tôi rất hài lòng với lần mua này.",
+                null, null);
+        HttpResponse<String> productPage = client.send(
+                HttpRequest.newBuilder(URI.create(
+                        "http://localhost:" + port
+                                + "/products/" + product.getId()))
+                        .GET().build(),
+                HttpResponse.BodyHandlers.ofString()
+        );
+        assertThat(productPage.statusCode())
+                .as(productPage.body()).isEqualTo(200);
     }
 }

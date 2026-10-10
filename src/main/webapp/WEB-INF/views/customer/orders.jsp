@@ -38,10 +38,17 @@
                             <c:out value="${order.shippingAddress}"/>
                         </p>
                         <c:forEach var="line" items="${order.lines}">
+                            <c:url var="reviewUrl"
+                                   value="/orders/${order.id}/items/${line.detailId}/review"/>
                             <div class="d-flex justify-content-between border-bottom py-2">
                                 <span>
                                     <c:out value="${line.productName}"/>
                                     × ${line.quantity}
+                                    <c:if test="${line.canReview}">
+                                        <a class="d-block small" href="${reviewUrl}">
+                                            Viết đánh giá
+                                        </a>
+                                    </c:if>
                                 </span>
                                 <span>
                                     <fmt:formatNumber value="${line.subtotal}"
