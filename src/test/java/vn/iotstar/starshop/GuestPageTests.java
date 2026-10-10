@@ -249,7 +249,8 @@ class GuestPageTests {
         );
         assertThat(couponPage.statusCode())
                 .as(couponPage.body()).isEqualTo(200);
-        assertThat(couponPage.body()).contains("PAGE10", "10.000");
+        assertThat(couponPage.body()).contains(
+                "Mã giảm giá dùng được", "PAGE10", "10.000");
 
         Long orderId = checkoutService.placeOrder(
                 user.getEmail(), address.getId(), provider.getId(),

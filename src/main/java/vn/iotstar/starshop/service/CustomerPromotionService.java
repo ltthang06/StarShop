@@ -3,7 +3,9 @@ package vn.iotstar.starshop.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.dto.CustomerCartLine;
 import vn.iotstar.starshop.dto.CustomerCartSummary;
 import vn.iotstar.starshop.dto.CustomerCheckoutQuote;
+import vn.iotstar.starshop.dto.CustomerVoucherCard;
 import vn.iotstar.starshop.entity.Promotion;
 import vn.iotstar.starshop.entity.ShippingProvider;
 import vn.iotstar.starshop.enums.PromotionScope;
@@ -42,11 +45,7 @@ public class CustomerPromotionService {
         ).orElseThrow(() -> new IllegalArgumentException(
                 "Đơn vị vận chuyển không còn hoạt động"));
 
-        Map<Long, BigDecimal> subtotals = new LinkedHashMap<>();
-        for (CustomerCartLine line : cart.getLines()) {
-            subtotals.merge(line.getShopId(), line.getSubtotal(),
-                    BigDecimal::add);
-        }
+        Map<Long, BigDecimal> subtotals = shopSubtotals(cart);
 
         Map<Long, BigDecimal> discounts = calculate(
                 findPromotion(code, false), subtotals,
@@ -63,6 +62,49 @@ public class CustomerPromotionService {
                 cart.getSubtotal().add(shippingFee).subtract(discount),
                 normalize(code)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomerVoucherCard> available(
+            String email, Long providerId) {
+
+        CustomerCartSummary cart = cartService.summary(email);
+        if (!cart.isReadyToCheckout()) {
+            return List.of();
+        }
+        ShippingProvider provider = providerRepository.findByIdAndActiveTrue(
+                providerId
+        ).orElseThrow(() -> new IllegalArgumentException(
+                "Đơn vị vận chuyển không còn hoạt động"));
+
+        Map<Long, BigDecimal> subtotals = shopSubtotals(cart);
+        List<CustomerVoucherCard> vouchers = new ArrayList<>();
+        for (Promotion promotion : promotionRepository.findAvailable(
+                LocalDateTime.now())) {
+            BigDecimal eligibleSubtotal = promotion.getScope()
+                    == PromotionScope.SYSTEM
+                    ? cart.getSubtotal()
+                    : promotion.getShop() == null
+                            ? null
+                            : subtotals.get(promotion.getShop().getId());
+            if (eligibleSubtotal == null
+                    || promotion.getMinOrderAmount() != null
+                    && eligibleSubtotal.compareTo(
+                            promotion.getMinOrderAmount()) < 0) {
+                continue;
+            }
+
+            BigDecimal discount = calculate(
+                    promotion, subtotals, provider.getBaseFee())
+                    .values().stream()
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (discount.signum() > 0) {
+                vouchers.add(new CustomerVoucherCard(
+                        promotion.getCode(), promotion.getName(),
+                        promotion.getDescription(), discount));
+            }
+        }
+        return vouchers;
     }
 
     @Transactional
@@ -187,5 +229,15 @@ public class CustomerPromotionService {
             return null;
         }
         return code.trim();
+    }
+
+    private Map<Long, BigDecimal> shopSubtotals(
+            CustomerCartSummary cart) {
+        Map<Long, BigDecimal> subtotals = new LinkedHashMap<>();
+        for (CustomerCartLine line : cart.getLines()) {
+            subtotals.merge(line.getShopId(), line.getSubtotal(),
+                    BigDecimal::add);
+        }
+        return subtotals;
     }
 }

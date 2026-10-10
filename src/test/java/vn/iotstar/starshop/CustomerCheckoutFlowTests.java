@@ -129,6 +129,25 @@ class CustomerCheckoutFlowTests {
         promotion.setEndAt(LocalDateTime.now().plusDays(1));
         promotion = promotionRepository.save(promotion);
 
+        Promotion shopShipping = new Promotion();
+        shopShipping.setCode("SHOPSHIP");
+        shopShipping.setName("Miễn phí giao shop đầu tiên");
+        shopShipping.setShop(first.getShop());
+        shopShipping.setScope(PromotionScope.SHOP);
+        shopShipping.setType(PromotionType.FREE_SHIPPING);
+        shopShipping.setQuantity(2);
+        shopShipping.setStartAt(LocalDateTime.now().minusDays(1));
+        shopShipping.setEndAt(LocalDateTime.now().plusDays(1));
+        promotionRepository.save(shopShipping);
+
+        assertThat(promotionService.available(
+                customer.getEmail(), provider.getId()))
+                .extracting("code")
+                .contains("SAVE50", "SHOPSHIP");
+        assertThat(promotionService.quote(
+                customer.getEmail(), provider.getId(), "SHOPSHIP")
+                .getTotalAmount()).isEqualByComparingTo("315000");
+
         assertThat(promotionService.quote(
                 customer.getEmail(), provider.getId(), "SAVE50")
                 .getTotalAmount()).isEqualByComparingTo("280000");

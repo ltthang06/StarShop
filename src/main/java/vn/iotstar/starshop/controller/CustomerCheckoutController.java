@@ -53,6 +53,8 @@ public class CustomerCheckoutController {
                 .orElse(providers.isEmpty() ? null : providers.get(0));
         if (selected != null) {
             model.addAttribute("selectedProvider", selected);
+            model.addAttribute("vouchers", promotionService.available(
+                    authentication.getName(), selected.getId()));
             try {
                 model.addAttribute("quote", promotionService.quote(
                         authentication.getName(), selected.getId(), code));

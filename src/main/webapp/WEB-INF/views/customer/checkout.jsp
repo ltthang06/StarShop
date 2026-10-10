@@ -62,6 +62,41 @@
                 </div>
             </form>
 
+            <c:if test="${not empty vouchers}">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h2 class="h5">Mã giảm giá dùng được</h2>
+                        <c:forEach var="voucher" items="${vouchers}">
+                            <div class="d-flex align-items-center justify-content-between gap-3 border-top py-3">
+                                <div>
+                                    <strong><c:out value="${voucher.name}"/></strong>
+                                    <span class="badge text-bg-light ms-1">
+                                        <c:out value="${voucher.code}"/>
+                                    </span>
+                                    <c:if test="${not empty voucher.description}">
+                                        <div class="small text-muted">
+                                            <c:out value="${voucher.description}"/>
+                                        </div>
+                                    </c:if>
+                                    <div class="small text-danger">
+                                        Giảm <fmt:formatNumber value="${voucher.discountAmount}"
+                                                               maxFractionDigits="0"/> đ
+                                    </div>
+                                </div>
+                                <form action="${checkoutUrl}" method="get" class="m-0">
+                                    <input type="hidden" name="providerId"
+                                           value="${selectedProvider.id}">
+                                    <input type="hidden" name="code"
+                                           value="<c:out value='${voucher.code}'/>">
+                                    <button class="btn btn-outline-danger btn-sm"
+                                            type="submit">Áp dụng</button>
+                                </form>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </div>
+            </c:if>
+
             <form action="${checkoutUrl}" method="post">
                 <input type="hidden" name="${_csrf.parameterName}"
                        value="${_csrf.token}">
