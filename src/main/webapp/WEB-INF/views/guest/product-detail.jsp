@@ -7,6 +7,7 @@
 <c:url var="productsUrl" value="/products"/>
 <c:url var="fallbackUrl" value="/images/no-image.svg"/>
 <c:url var="wishlistAddUrl" value="/wishlist/${product.id}"/>
+<c:url var="cartAddUrl" value="/cart/items"/>
 
 <main class="container py-5">
     <a href="${productsUrl}" class="btn btn-link mb-3">← Tất cả sản phẩm</a>
@@ -48,6 +49,15 @@
             <c:if test="${not empty errorMessage}">
                 <div class="alert alert-danger"><c:out value="${errorMessage}"/></div>
             </c:if>
+            <form action="${cartAddUrl}" method="post" class="d-flex gap-2 mb-3">
+                <input type="hidden" name="${_csrf.parameterName}"
+                       value="${_csrf.token}">
+                <input type="hidden" name="productId" value="${product.id}">
+                <input class="form-control" type="number" name="quantity"
+                       min="1" max="${product.quantity}" value="1"
+                       style="width: 90px" aria-label="Số lượng">
+                <button class="btn btn-danger" type="submit">Thêm vào giỏ hàng</button>
+            </form>
             <form action="${wishlistAddUrl}" method="post">
                 <input type="hidden" name="${_csrf.parameterName}"
                        value="${_csrf.token}">
