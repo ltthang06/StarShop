@@ -46,10 +46,12 @@ public class CustomerCheckoutService {
     private final CustomerShippingProviderRepository providerRepository;
     private final OrderRepository orderRepository;
     private final OrderDetailRepository detailRepository;
+    private final CustomerPromotionService promotionService;
 
     @Transactional
     public List<Long> placeOrder(
-            String email, Long addressId, Long providerId, String note) {
+            String email, Long addressId, Long providerId,
+            String note, String code) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -91,12 +93,22 @@ public class CustomerCheckoutService {
                         Collectors.toList()
                 ));
 
-        List<Long> orderIds = new ArrayList<>();
-        for (List<PurchaseLine> shopLines : byShop.values()) {
-            BigDecimal subtotal = shopLines.stream()
+        Map<Long, BigDecimal> subtotals = new LinkedHashMap<>();
+        for (Map.Entry<Long, List<PurchaseLine>> entry : byShop.entrySet()) {
+            BigDecimal subtotal = entry.getValue().stream()
                     .map(line -> line.price().multiply(
                             BigDecimal.valueOf(line.item().getQuantity())))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+            subtotals.put(entry.getKey(), subtotal);
+        }
+        Map<Long, BigDecimal> discounts = promotionService.apply(
+                code, subtotals, provider.getBaseFee());
+
+        List<Long> orderIds = new ArrayList<>();
+        for (Map.Entry<Long, List<PurchaseLine>> entry : byShop.entrySet()) {
+            List<PurchaseLine> shopLines = entry.getValue();
+            BigDecimal subtotal = subtotals.get(entry.getKey());
+            BigDecimal discount = discounts.get(entry.getKey());
 
             Order order = new Order();
             order.setUser(user);
@@ -108,8 +120,9 @@ public class CustomerCheckoutService {
             order.setSubtotal(subtotal);
             order.setShippingProvider(provider);
             order.setShippingFee(provider.getBaseFee());
-            order.setDiscountAmount(BigDecimal.ZERO);
-            order.setTotalAmount(subtotal.add(provider.getBaseFee()));
+            order.setDiscountAmount(discount);
+            order.setTotalAmount(subtotal.add(provider.getBaseFee())
+                    .subtract(discount));
             order.setPaymentMethod(PaymentMethod.COD);
             order.setPaymentStatus(PaymentStatus.PENDING);
             order.setStatus(OrderStatus.NEW);

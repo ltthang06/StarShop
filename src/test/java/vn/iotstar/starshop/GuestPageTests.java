@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,11 +29,14 @@ import vn.iotstar.starshop.entity.Category;
 import vn.iotstar.starshop.entity.Product;
 import vn.iotstar.starshop.entity.Order;
 import vn.iotstar.starshop.entity.ShippingProvider;
+import vn.iotstar.starshop.entity.Promotion;
 import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.entity.User;
 import vn.iotstar.starshop.enums.RoleName;
 import vn.iotstar.starshop.enums.ShopStatus;
 import vn.iotstar.starshop.enums.OrderStatus;
+import vn.iotstar.starshop.enums.PromotionScope;
+import vn.iotstar.starshop.enums.PromotionType;
 import vn.iotstar.starshop.enums.UserStatus;
 import vn.iotstar.starshop.repository.RoleRepository;
 import vn.iotstar.starshop.repository.CategoryRepository;
@@ -42,6 +46,7 @@ import vn.iotstar.starshop.repository.CustomerShippingProviderRepository;
 import vn.iotstar.starshop.repository.ShopRepository;
 import vn.iotstar.starshop.repository.OrderDetailRepository;
 import vn.iotstar.starshop.repository.OrderRepository;
+import vn.iotstar.starshop.repository.CustomerPromotionRepository;
 import vn.iotstar.starshop.repository.UserRepository;
 import vn.iotstar.starshop.service.CustomerCartService;
 import vn.iotstar.starshop.service.CustomerCheckoutService;
@@ -97,6 +102,9 @@ class GuestPageTests {
 
     @Autowired
     private OrderDetailRepository detailRepository;
+
+    @Autowired
+    private CustomerPromotionRepository promotionRepository;
 
     @Test
     void publicPagesRender() throws Exception {
@@ -177,6 +185,17 @@ class GuestPageTests {
         provider.setBaseFee(BigDecimal.valueOf(15000));
         provider = providerRepository.save(provider);
 
+        Promotion promotion = new Promotion();
+        promotion.setCode("PAGE10");
+        promotion.setName("Giảm giá kiểm tra trang");
+        promotion.setScope(PromotionScope.SYSTEM);
+        promotion.setType(PromotionType.FIXED_AMOUNT);
+        promotion.setDiscountValue(BigDecimal.valueOf(10000));
+        promotion.setQuantity(10);
+        promotion.setStartAt(LocalDateTime.now().minusDays(1));
+        promotion.setEndAt(LocalDateTime.now().plusDays(1));
+        promotionRepository.save(promotion);
+
         HttpClient client = HttpClient.newBuilder()
                 .cookieHandler(new CookieManager(null,
                         CookiePolicy.ACCEPT_ALL))
@@ -221,8 +240,20 @@ class GuestPageTests {
                     .isEqualTo(200);
         }
 
+        HttpResponse<String> couponPage = client.send(
+                HttpRequest.newBuilder(URI.create(
+                        "http://localhost:" + port + "/checkout?providerId="
+                                + provider.getId() + "&code=PAGE10"))
+                        .GET().build(),
+                HttpResponse.BodyHandlers.ofString()
+        );
+        assertThat(couponPage.statusCode())
+                .as(couponPage.body()).isEqualTo(200);
+        assertThat(couponPage.body()).contains("PAGE10", "10.000");
+
         Long orderId = checkoutService.placeOrder(
-                user.getEmail(), address.getId(), provider.getId(), null)
+                user.getEmail(), address.getId(), provider.getId(),
+                null, null)
                 .get(0);
         Order order = orderRepository.findById(orderId).orElseThrow();
         order.setStatus(OrderStatus.DELIVERED);

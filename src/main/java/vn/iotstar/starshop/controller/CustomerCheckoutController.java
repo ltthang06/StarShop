@@ -16,6 +16,8 @@ import vn.iotstar.starshop.repository.CustomerShippingProviderRepository;
 import vn.iotstar.starshop.service.CustomerAccountService;
 import vn.iotstar.starshop.service.CustomerCartService;
 import vn.iotstar.starshop.service.CustomerCheckoutService;
+import vn.iotstar.starshop.service.CustomerPromotionService;
+import vn.iotstar.starshop.entity.ShippingProvider;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,9 +27,14 @@ public class CustomerCheckoutController {
     private final CustomerAccountService accountService;
     private final CustomerCheckoutService checkoutService;
     private final CustomerShippingProviderRepository providerRepository;
+    private final CustomerPromotionService promotionService;
 
     @GetMapping("/checkout")
-    public String checkout(Authentication authentication, Model model) {
+    public String checkout(
+            Authentication authentication,
+            @RequestParam(required = false) Long providerId,
+            @RequestParam(required = false) String code,
+            Model model) {
         CustomerCartSummary cart = cartService.summary(
                 authentication.getName());
         if (!cart.isReadyToCheckout()) {
@@ -37,8 +44,24 @@ public class CustomerCheckoutController {
         model.addAttribute("cart", cart);
         model.addAttribute("addresses", accountService.addresses(
                 authentication.getName()));
-        model.addAttribute("providers", providerRepository
-                .findByActiveTrueOrderByBaseFeeAsc());
+        var providers = providerRepository
+                .findByActiveTrueOrderByBaseFeeAsc();
+        model.addAttribute("providers", providers);
+        ShippingProvider selected = providers.stream()
+                .filter(provider -> provider.getId().equals(providerId))
+                .findFirst()
+                .orElse(providers.isEmpty() ? null : providers.get(0));
+        if (selected != null) {
+            model.addAttribute("selectedProvider", selected);
+            try {
+                model.addAttribute("quote", promotionService.quote(
+                        authentication.getName(), selected.getId(), code));
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("errorMessage", ex.getMessage());
+                model.addAttribute("quote", promotionService.quote(
+                        authentication.getName(), selected.getId(), null));
+            }
+        }
         return "customer/checkout";
     }
 
@@ -48,11 +71,13 @@ public class CustomerCheckoutController {
             @RequestParam Long addressId,
             @RequestParam Long providerId,
             @RequestParam(required = false) String note,
+            @RequestParam(required = false) String code,
             RedirectAttributes redirectAttributes) {
 
         try {
             List<Long> orderIds = checkoutService.placeOrder(
-                    authentication.getName(), addressId, providerId, note);
+                    authentication.getName(), addressId, providerId,
+                    note, code);
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Đã đặt " + orderIds.size() + " đơn hàng"

@@ -11,6 +11,7 @@ public class CustomerCartLine {
 
     private Long id;
     private Long productId;
+    private Long shopId;
     private String productName;
     private String imageUrl;
     private BigDecimal unitPrice;

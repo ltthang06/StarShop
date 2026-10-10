@@ -28,9 +28,47 @@
 
     <div class="row g-4">
         <div class="col-lg-8">
+            <form action="${checkoutUrl}" method="get"
+                  class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h5">Vận chuyển và mã giảm giá</h2>
+                    <label class="form-label" for="providerId">
+                        Đơn vị vận chuyển
+                    </label>
+                    <select class="form-select mb-3" id="providerId"
+                            name="providerId" onchange="this.form.submit()"
+                            required>
+                        <c:forEach var="provider" items="${providers}">
+                            <option value="${provider.id}"
+                                    ${provider.id eq selectedProvider.id ? 'selected' : ''}>
+                                <c:out value="${provider.name}"/> ·
+                                <fmt:formatNumber value="${provider.baseFee}"
+                                                  maxFractionDigits="0"/> đ / shop
+                            </option>
+                        </c:forEach>
+                    </select>
+                    <label class="form-label" for="code">Mã giảm giá</label>
+                    <div class="d-flex gap-2">
+                        <input class="form-control" id="code" name="code"
+                               value="<c:out value='${param.code}'/>"
+                               maxlength="50" placeholder="Nhập mã nếu có">
+                        <button class="btn btn-outline-danger" type="submit">
+                            Tính lại
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        Bấm Tính lại để áp dụng mã và xem tổng tiền.
+                    </div>
+                </div>
+            </form>
+
             <form action="${checkoutUrl}" method="post">
                 <input type="hidden" name="${_csrf.parameterName}"
                        value="${_csrf.token}">
+                <input type="hidden" name="providerId"
+                       value="${selectedProvider.id}">
+                <input type="hidden" name="code"
+                       value="<c:out value='${quote.code}'/>">
 
                 <div class="card shadow-sm mb-3">
                     <div class="card-body">
@@ -62,22 +100,7 @@
 
                 <div class="card shadow-sm mb-3">
                     <div class="card-body">
-                        <h2 class="h5">Vận chuyển và thanh toán</h2>
-                        <label class="form-label" for="providerId">
-                            Đơn vị vận chuyển
-                        </label>
-                        <select class="form-select mb-3" id="providerId"
-                                name="providerId" required>
-                            <c:forEach var="provider" items="${providers}">
-                                <option value="${provider.id}"
-                                        data-fee="${provider.baseFee}">
-                                    <c:out value="${provider.name}"/> ·
-                                    <fmt:formatNumber value="${provider.baseFee}"
-                                                      maxFractionDigits="0"/> đ / shop
-                                </option>
-                            </c:forEach>
-                        </select>
-                        <p class="mb-3">Thanh toán khi nhận hàng (COD)</p>
+                        <h2 class="h5">Thanh toán khi nhận hàng (COD)</h2>
                         <label class="form-label" for="note">Ghi chú</label>
                         <textarea class="form-control" id="note" name="note"
                                   rows="3" maxlength="500"></textarea>
@@ -85,7 +108,7 @@
                 </div>
 
                 <button class="btn btn-danger" type="submit"
-                        ${empty addresses or empty providers ? 'disabled' : ''}>
+                        ${empty addresses or empty quote ? 'disabled' : ''}>
                     Xác nhận đặt hàng
                 </button>
             </form>
@@ -93,19 +116,30 @@
 
         <div class="col-lg-4">
             <div class="card shadow-sm">
-                <div class="card-body" id="checkoutSummary"
-                     data-subtotal="${cart.subtotal}"
-                     data-shops="${cart.shopCount}">
+                <div class="card-body">
                     <h2 class="h5">Tóm tắt đơn hàng</h2>
                     <p>Sản phẩm: ${cart.lines.size()} món</p>
                     <p>Tạm tính:
                         <fmt:formatNumber value="${cart.subtotal}"
                                           maxFractionDigits="0"/> đ
                     </p>
-                    <p>Phí giao hàng: <span id="shippingFee">0 đ</span></p>
+                    <c:if test="${not empty quote}">
+                        <p>Phí giao hàng:
+                            <fmt:formatNumber value="${quote.shippingFee}"
+                                              maxFractionDigits="0"/> đ
+                        </p>
+                        <p>Giảm giá:
+                            <fmt:formatNumber value="${quote.discountAmount}"
+                                              maxFractionDigits="0"/> đ
+                        </p>
+                    </c:if>
                     <hr>
                     <p class="fs-5 fw-bold text-danger">
-                        Tổng cộng: <span id="checkoutTotal">0 đ</span>
+                        Tổng cộng:
+                        <c:if test="${not empty quote}">
+                            <fmt:formatNumber value="${quote.totalAmount}"
+                                              maxFractionDigits="0"/> đ
+                        </c:if>
                     </p>
                     <p class="small text-muted mb-0">
                         Mỗi shop tạo một đơn hàng và tính phí giao riêng.
@@ -115,24 +149,5 @@
         </div>
     </div>
 </main>
-
-<script>
-    const providerSelect = document.getElementById('providerId');
-    const checkoutSummary = document.getElementById('checkoutSummary');
-    const subtotal = Number(checkoutSummary.dataset.subtotal);
-    const shopCount = Number(checkoutSummary.dataset.shops);
-    const money = new Intl.NumberFormat('vi-VN');
-
-    function updateCheckoutTotal() {
-        const selected = providerSelect.selectedOptions[0];
-        const fee = selected ? Number(selected.dataset.fee) * shopCount : 0;
-        document.getElementById('shippingFee').textContent = money.format(fee) + ' đ';
-        document.getElementById('checkoutTotal').textContent =
-            money.format(subtotal + fee) + ' đ';
-    }
-
-    providerSelect.addEventListener('change', updateCheckoutTotal);
-    updateCheckoutTotal();
-</script>
 
 <%@ include file="../common/footer.jsp" %>

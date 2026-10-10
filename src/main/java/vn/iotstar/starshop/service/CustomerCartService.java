@@ -115,6 +115,7 @@ public class CustomerCartService {
         return new CustomerCartLine(
                 item.getId(),
                 product.getId(),
+                product.getShop().getId(),
                 product.getName(),
                 imageUrl,
                 price,
