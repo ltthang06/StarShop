@@ -24,10 +24,17 @@ public class Promotion {
     @Column(nullable = false, unique = true, length = 50)
     private String code;
 
-    @Column(nullable = false, length = 150)
+    @Column(
+            nullable = false,
+            length = 150,
+            columnDefinition = "NVARCHAR(150)"
+    )
     private String name;
 
-    @Column(length = 500)
+    @Column(
+            length = 500,
+            columnDefinition = "NVARCHAR(500)"
+    )
     private String description;
 
     @Enumerated(EnumType.STRING)
