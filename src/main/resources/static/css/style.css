@@ -1,16 +1,16 @@
-/* ===== GENERAL ===== */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
 }
 
-/* ===== NAVBAR ===== */
+
 .navbar-brand {
     font-size: 1.5rem;
     letter-spacing: 1px;
 }
 
-/* ===== PRODUCT CARD ===== */
+
 .product-card {
     transition: transform 0.2s, box-shadow 0.2s;
     border: none;
@@ -40,7 +40,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* ===== HERO BANNER ===== */
+
 .hero-banner {
     background: linear-gradient(135deg, #dc3545, #ff6b6b);
     color: white;
@@ -48,7 +48,7 @@ body {
     margin-bottom: 40px;
 }
 
-/* ===== SECTION TITLE ===== */
+
 .section-title {
     position: relative;
     font-weight: bold;
@@ -66,7 +66,7 @@ body {
     background-color: #dc3545;
 }
 
-/* ===== BUTTONS ===== */
+
 .btn-starshop {
     background-color: #dc3545;
     color: white;
@@ -79,12 +79,12 @@ body {
     color: white;
 }
 
-/* ===== CART ===== */
+
 .cart-badge {
     position: relative;
 }
 
-/* ===== FOOTER ===== */
+
 footer a:hover {
     color: white !important;
 }
