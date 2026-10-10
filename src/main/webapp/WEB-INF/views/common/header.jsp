@@ -5,6 +5,7 @@
 <c:url var="productsUrl" value="/products"/>
 <c:url var="cartUrl" value="/cart"/>
 <c:url var="wishlistUrl" value="/wishlist"/>
+<c:url var="recentlyViewedUrl" value="/recently-viewed"/>
 <c:url var="profileUrl" value="/profile"/>
 <c:url var="ordersUrl" value="/orders"/>
 <c:url var="loginUrl" value="/login"/>
@@ -70,6 +71,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="${profileUrl}">Hồ sơ</a></li>
                                 <li><a class="dropdown-item" href="${wishlistUrl}">Yêu thích</a></li>
+                                <li><a class="dropdown-item" href="${recentlyViewedUrl}">Đã xem</a></li>
                                 <li><a class="dropdown-item" href="${ordersUrl}">Đơn hàng</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li class="px-3">

@@ -41,6 +41,7 @@ class CustomerProfileFlowTests {
         User user = new User();
         user.setFullName("Khách hàng");
         user.setEmail(EMAIL);
+        user.setPhone("0900000003");
         user.setPassword("unused");
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);

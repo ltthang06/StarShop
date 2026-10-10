@@ -6,6 +6,7 @@
 <fmt:setLocale value="vi_VN"/>
 <c:url var="productsUrl" value="/products"/>
 <c:url var="fallbackUrl" value="/images/no-image.svg"/>
+<c:url var="wishlistAddUrl" value="/wishlist/${product.id}"/>
 
 <main class="container py-5">
     <a href="${productsUrl}" class="btn btn-link mb-3">← Tất cả sản phẩm</a>
@@ -41,6 +42,19 @@
             <p style="white-space: pre-line">
                 <c:out value="${product.description}"/>
             </p>
+            <c:if test="${not empty successMessage}">
+                <div class="alert alert-success"><c:out value="${successMessage}"/></div>
+            </c:if>
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger"><c:out value="${errorMessage}"/></div>
+            </c:if>
+            <form action="${wishlistAddUrl}" method="post">
+                <input type="hidden" name="${_csrf.parameterName}"
+                       value="${_csrf.token}">
+                <button class="btn btn-outline-danger" type="submit">
+                    <i class="bi bi-heart"></i> Thêm vào yêu thích
+                </button>
+            </form>
         </div>
     </div>
 </main>

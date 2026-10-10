@@ -1,6 +1,8 @@
 package vn.iotstar.starshop.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +12,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import vn.iotstar.starshop.service.CustomerCatalogService;
+import vn.iotstar.starshop.service.CustomerActivityService;
 
 @Controller
 @RequiredArgsConstructor
 public class CustomerProductController {
 
     private final CustomerCatalogService catalogService;
+    private final CustomerActivityService activityService;
 
     @GetMapping({"/products", "/products/search"})
     public String list(
@@ -35,11 +39,16 @@ public class CustomerProductController {
     }
 
     @GetMapping("/products/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Authentication authentication,
+            Model model) {
         model.addAttribute("product", catalogService.detail(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Không tìm thấy sản phẩm")));
+        if (authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            activityService.recordView(authentication.getName(), id);
+        }
         return "guest/product-detail";
     }
 }
