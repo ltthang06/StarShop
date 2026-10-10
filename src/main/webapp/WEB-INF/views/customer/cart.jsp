@@ -5,6 +5,7 @@
 
 <fmt:setLocale value="vi_VN"/>
 <c:url var="productsUrl" value="/products"/>
+<c:url var="checkoutUrl" value="/checkout"/>
 <c:url var="fallbackUrl" value="/images/no-image.svg"/>
 
 <main class="container py-5">
@@ -78,6 +79,12 @@
                                 <fmt:formatNumber value="${cart.subtotal}"
                                                   maxFractionDigits="0"/> đ
                             </p>
+                            <p class="text-muted">Phí giao hàng được tính khi chọn đơn vị vận chuyển.</p>
+                            <c:if test="${cart.readyToCheckout}">
+                                <a class="btn btn-danger w-100" href="${checkoutUrl}">
+                                    Tiếp tục đặt hàng
+                                </a>
+                            </c:if>
                             <c:if test="${not cart.readyToCheckout}">
                                 <p class="text-danger mb-0">
                                     Hãy cập nhật hoặc xóa sản phẩm không còn đủ hàng.

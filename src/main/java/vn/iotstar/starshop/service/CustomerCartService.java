@@ -48,8 +48,12 @@ public class CustomerCartService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         boolean ready = !lines.isEmpty() && lines.stream()
                 .allMatch(CustomerCartLine::isAvailable);
+        long shopCount = items.stream()
+                .map(item -> item.getProduct().getShop().getId())
+                .distinct()
+                .count();
 
-        return new CustomerCartSummary(lines, subtotal, ready);
+        return new CustomerCartSummary(lines, subtotal, ready, shopCount);
     }
 
     @Transactional
