@@ -37,6 +37,27 @@ public class CustomerCatalogService {
         ).stream().map(this::toCard).toList();
     }
 
+    public List<PublicProductCard> top20(String sort) {
+        if ("favorites".equals(sort)) {
+            return catalogRepository.findMostWishlistedIds(
+                    ProductStatus.ACTIVE,
+                    ShopStatus.ACTIVE,
+                    PageRequest.of(0, 20)
+            ).stream()
+                    .map(this::detail)
+                    .flatMap(Optional::stream)
+                    .toList();
+        }
+
+        return catalogRepository.search(
+                ProductStatus.ACTIVE,
+                ShopStatus.ACTIVE,
+                "",
+                null,
+                PageRequest.of(0, 20, sortOrder(sort))
+        ).stream().map(this::toCard).toList();
+    }
+
     public Page<PublicProductCard> search(
             String keyword, Long categoryId, String sort, int page) {
 

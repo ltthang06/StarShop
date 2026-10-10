@@ -106,6 +106,7 @@ class GuestPageTests {
         String[] paths = {
                 "/",
                 "/products",
+                "/products/top?sort=favorites",
                 "/login",
                 "/register",
                 "/verify-otp?email=customer%40example.com",

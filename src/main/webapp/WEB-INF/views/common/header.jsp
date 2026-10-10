@@ -3,6 +3,7 @@
 
 <c:url var="homeUrl" value="/"/>
 <c:url var="productsUrl" value="/products"/>
+<c:url var="topProductsUrl" value="/products/top"/>
 <c:url var="cartUrl" value="/cart"/>
 <c:url var="wishlistUrl" value="/wishlist"/>
 <c:url var="recentlyViewedUrl" value="/recently-viewed"/>
@@ -42,6 +43,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="${productsUrl}">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${topProductsUrl}">Top 20</a>
                 </li>
             </ul>
 

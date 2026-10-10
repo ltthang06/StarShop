@@ -23,6 +23,20 @@ public interface CustomerCatalogRepository extends JpaRepository<Product, Long> 
     @Query("SELECT p FROM Product p WHERE p.id = :id")
     Optional<Product> findByIdForUpdate(@Param("id") Long id);
 
+    @Query("""
+            SELECT w.product.id FROM Wishlist w
+            WHERE w.product.status = :productStatus
+              AND w.product.shop.status = :shopStatus
+              AND w.product.category.active = true
+              AND w.product.quantity > 0
+            GROUP BY w.product.id
+            ORDER BY COUNT(w.id) DESC, w.product.id DESC
+            """)
+    List<Long> findMostWishlistedIds(
+            @Param("productStatus") ProductStatus productStatus,
+            @Param("shopStatus") ShopStatus shopStatus,
+            Pageable pageable);
+
     @EntityGraph(attributePaths = "category")
     @Query("""
             SELECT p FROM Product p

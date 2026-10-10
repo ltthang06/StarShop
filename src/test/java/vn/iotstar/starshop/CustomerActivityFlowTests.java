@@ -30,6 +30,7 @@ import vn.iotstar.starshop.repository.CustomerProductViewRepository;
 import vn.iotstar.starshop.repository.CustomerWishlistRepository;
 import vn.iotstar.starshop.repository.ShopRepository;
 import vn.iotstar.starshop.repository.UserRepository;
+import vn.iotstar.starshop.service.CustomerCatalogService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -57,6 +58,9 @@ class CustomerActivityFlowTests {
 
     @Autowired
     private CustomerProductViewRepository viewRepository;
+
+    @Autowired
+    private CustomerCatalogService catalogService;
 
     private Long productId;
     private Long userId;
@@ -114,6 +118,8 @@ class CustomerActivityFlowTests {
 
         assertThat(wishlistRepository.findByUserIdAndProductId(userId, productId))
                 .isPresent();
+        assertThat(catalogService.top20("favorites"))
+                .extracting("id").contains(productId);
 
         mockMvc.perform(get("/wishlist"))
                 .andExpect(status().isOk())

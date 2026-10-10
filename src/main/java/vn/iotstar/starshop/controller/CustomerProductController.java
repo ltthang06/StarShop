@@ -40,6 +40,16 @@ public class CustomerProductController {
         return "guest/products";
     }
 
+    @GetMapping("/products/top")
+    public String top20(
+            @RequestParam(defaultValue = "newest") String sort,
+            Model model) {
+
+        model.addAttribute("products", catalogService.top20(sort));
+        model.addAttribute("sort", sort);
+        return "guest/top-products";
+    }
+
     @GetMapping("/products/{id}")
     public String detail(@PathVariable Long id, Authentication authentication,
             Model model) {
