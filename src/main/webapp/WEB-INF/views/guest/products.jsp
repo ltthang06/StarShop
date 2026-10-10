@@ -41,7 +41,7 @@
     </form>
 
     <c:choose>
-        <c:when test="${products.empty}">
+        <c:when test="${empty products.content}">
             <p class="text-muted">Không tìm thấy sản phẩm phù hợp.</p>
         </c:when>
         <c:otherwise>
