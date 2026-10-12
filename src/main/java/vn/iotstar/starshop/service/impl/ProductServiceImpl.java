@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ShopRepository shopRepository;
     private final CategoryRepository categoryRepository;
+    private final vn.iotstar.starshop.repository.ProductModerationRepository moderations;
 
     @Override
     @Transactional(readOnly = true)
@@ -202,6 +203,13 @@ public class ProductServiceImpl implements ProductService {
             Product product,
             ProductRequest request,
             Category category) {
+
+        if (product.getId() != null) {
+            productRepository.findForModeration(product.getId()).orElseThrow();
+            if (moderations.existsByProductIdAndBlockedTrue(product.getId())) {
+                throw new IllegalArgumentException("Sản phẩm bị quản trị khóa; liên hệ quản trị để mở kiểm duyệt");
+            }
+        }
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());

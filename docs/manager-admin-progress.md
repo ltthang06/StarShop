@@ -1,5 +1,15 @@
 # Tiến độ Người 3 — Manager/Admin
 
+## Đợt hoàn thiện ngày 12/10/2026
+
+- Tích hợp Customer tại `72a7661`: OTP, profile/địa chỉ, giỏ hàng, COD, lịch sử đơn, đánh giá và voucher.
+- Hoàn thiện kiểm duyệt sản phẩm, voucher SYSTEM, Dashboard, thống kê/CSV, chi tiết User và quyền vận hành dành riêng Admin.
+- Bổ sung JWT cho API, thông báo database/WebSocket riêng từng tài khoản và SiteMesh khu vực quản trị.
+- Sửa tích hợp hủy/trả đơn hoàn tồn kho, khóa khi cập nhật đơn, thu COD và phone nullable trên SQL Server.
+- Có test HTTP/JSP, WebSocket thật, JWT, quyền và luồng Customer → Vendor → Manager → Shipper → Customer.
+- Báo cáo chi tiết và cấu hình demo: [Báo cáo Người 3](bao-cao-nguoi-3.md).
+- Submit nhánh cá nhân; chưa merge develop/main. SMTP, Cloudinary thật và toàn ứng dụng qua JDBC SQL Server cần cấu hình môi trường để demo.
+
 ## Đợt tích hợp ngày 03/10/2026
 
 - Đồng bộ `develop` tại `97d725a` (Vendor/Shipper đã merge ngày 30/09).
@@ -29,7 +39,7 @@ Chưa xác minh trên SQL Server thật hoặc upload Cloudinary thật.
 Khi chạy ứng dụng với Cloudinary, đặt biến môi trường `CLOUDINARY_CLOUD_NAME`,
 `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. Không đưa khóa thật vào Git.
 
-## Các phần tiếp theo
+## Kế hoạch tại đợt 03/10 (đã thực hiện trong đợt 12/10)
 
 - Quản lý sản phẩm từng shop, khuyến mãi cấp ứng dụng và thống kê quản trị.
 - Tích hợp với luồng đặt hàng/đăng ký của Người 1 khi có code.

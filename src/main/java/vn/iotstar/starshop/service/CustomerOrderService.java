@@ -28,6 +28,8 @@ import vn.iotstar.starshop.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class CustomerOrderService {
+    private final vn.iotstar.starshop.service.NotificationService notifications;
+
 
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -65,6 +67,7 @@ public class CustomerOrderService {
                         detail.getProduct().getId()))
                 .forEach(detail -> restoreStock(detail));
         order.setStatus(OrderStatus.CANCELLED);
+        notifications.orderChanged(order);
     }
 
     @Transactional
@@ -76,6 +79,7 @@ public class CustomerOrderService {
                     "Chỉ có thể yêu cầu trả đơn đã giao");
         }
         order.setStatus(OrderStatus.RETURN_REQUESTED);
+        notifications.orderChanged(order);
     }
 
     private CustomerOrderCard toCard(Order order) {

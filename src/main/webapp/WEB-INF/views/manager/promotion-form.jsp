@@ -1,0 +1,13 @@
+<%@ page contentType="text/html;charset=UTF-8" %><%@ taglib prefix="c" uri="jakarta.tags.core" %><%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %><%@ include file="fragments/header.jsp" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %><h1 class="h3">Voucher SYSTEM</h1><form:form modelAttribute="promotionForm" method="post" action="${pageContext.request.contextPath}/manager/promotions/save" cssClass="card card-body"><c:if test="${not empty promotionId}"><input type="hidden" name="id" value="${promotionId}"></c:if><form:errors path="*" element="div" cssClass="alert alert-danger"/><div class="row g-3">
+<div class="col-md-6"><label class="form-label">Mã voucher</label><form:input path="code" type="text"  cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Tên voucher</label><form:input path="name" type="text"  cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Mô tả</label><form:input path="description" type="text"  cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Mức giảm (% / VND; miễn phí vận chuyển nhập 0)</label><form:input path="discountValue" type="number" min="0" step="0.01" cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Đơn tối thiểu</label><form:input path="minOrderAmount" type="number" min="0" step="0.01" cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Giảm tối đa (có thể bỏ trống)</label><form:input path="maxDiscountAmount" type="number" min="0" step="0.01" cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Số lượt còn lại</label><form:input path="quantity" type="number" min="0" step="1" cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Bắt đầu</label><form:input path="startAt" type="datetime-local"  cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Kết thúc</label><form:input path="endAt" type="datetime-local"  cssClass="form-control"/></div>
+<div class="col-md-6"><label class="form-label">Loại</label><form:select path="type" cssClass="form-select"><form:options items="${types}"/></form:select></div><div><label><form:checkbox path="active"/> Bật voucher</label></div></div><div class="mt-3"><button class="btn btn-primary">Lưu</button> <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/manager/promotions">Quay lại</a></div></form:form>
+<%@ include file="fragments/footer.jsp" %>

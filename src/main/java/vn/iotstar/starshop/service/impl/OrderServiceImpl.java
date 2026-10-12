@@ -26,10 +26,12 @@ import vn.iotstar.starshop.service.OrderService;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
+    private final vn.iotstar.starshop.service.NotificationService notifications;
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
+    private final vn.iotstar.starshop.service.OrderInventoryService inventory;
 
     @Override
     @Transactional(readOnly = true)
@@ -165,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
             Long shopId,
             Long ownerId) {
 
-        Order order = getOrderByOwner(
+        Order order = lockedOrder(
                 orderId,
                 shopId,
                 ownerId
@@ -184,6 +186,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         orderRepository.save(order);
+        notifications.orderChanged(order);
     }
 
     @Override
@@ -193,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
             Long shopId,
             Long ownerId) {
 
-        Order order = getOrderByOwner(
+        Order order = lockedOrder(
                 orderId,
                 shopId,
                 ownerId
@@ -212,6 +215,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         orderRepository.save(order);
+        notifications.orderChanged(order);
     }
 
     @Override
@@ -221,7 +225,7 @@ public class OrderServiceImpl implements OrderService {
             Long shopId,
             Long ownerId) {
 
-        Order order = getOrderByOwner(
+        Order order = lockedOrder(
                 orderId,
                 shopId,
                 ownerId
@@ -240,8 +244,10 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(
                 OrderStatus.CANCELLED
         );
+        inventory.restore(orderId);
 
         orderRepository.save(order);
+        notifications.orderChanged(order);
     }
 
     @Override
@@ -251,7 +257,7 @@ public class OrderServiceImpl implements OrderService {
             Long shopId,
             Long ownerId) {
 
-        Order order = getOrderByOwner(
+        Order order = lockedOrder(
                 orderId,
                 shopId,
                 ownerId
@@ -265,43 +271,14 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-        List<OrderDetail> orderDetails =
-                orderDetailRepository
-                        .findByOrderIdOrderByIdAsc(
-                                orderId
-                        );
-
-        for (OrderDetail detail : orderDetails) {
-
-            Product product =
-                    detail.getProduct();
-
-            product.setQuantity(
-                    product.getQuantity()
-                    + detail.getQuantity()
-            );
-
-            if (product.getStatus()
-                    == ProductStatus.OUT_OF_STOCK
-                    && product.getQuantity() > 0) {
-
-                product.setStatus(
-                        ProductStatus.ACTIVE
-                );
-            }
-
-            productRepository.save(
-                    product
-            );
-        }
+        inventory.restore(orderId);
 
         order.setStatus(
                 OrderStatus.RETURNED
         );
 
-        orderRepository.save(
-                order
-        );
+        orderRepository.save(order);
+        notifications.orderChanged(order);
     }
 
     @Override
@@ -311,7 +288,7 @@ public class OrderServiceImpl implements OrderService {
             Long shopId,
             Long ownerId) {
 
-        Order order = getOrderByOwner(
+        Order order = lockedOrder(
                 orderId,
                 shopId,
                 ownerId
@@ -333,8 +310,14 @@ public class OrderServiceImpl implements OrderService {
                 PaymentStatus.REFUNDED
         );
 
-        orderRepository.save(
-                order
-        );
+        orderRepository.save(order);
+        notifications.orderChanged(order);
+    }
+
+    private Order lockedOrder(Long orderId, Long shopId, Long ownerId) {
+        Order order=orderRepository.findForUpdate(orderId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn"));
+        if (!order.getShop().getId().equals(shopId) || !order.getShop().getOwner().getId().equals(ownerId))
+            throw new IllegalArgumentException("Không tìm thấy đơn của shop");
+        return order;
     }
 }

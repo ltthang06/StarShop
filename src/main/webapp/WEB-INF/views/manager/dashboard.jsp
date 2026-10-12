@@ -1,28 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>StarShop - Quản trị</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container"><a class="navbar-brand" href="${pageContext.request.contextPath}/manager">StarShop Admin</a>
-        <span class="text-white-50">Manager / Admin</span></div>
-</nav>
-<main class="container py-4">
-    <div class="d-flex gap-2 flex-wrap mb-3"><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/users">Người dùng</a><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/shipping-providers">Đơn vị vận chuyển</a><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/orders">Đơn hàng / Phân công</a></div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div><h1 class="h3 mb-1">Bảng điều khiển</h1><p class="text-muted mb-0">Khu vực quản lý hệ thống</p></div>
-        <div class="d-flex gap-2"><a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/manager/categories">Danh mục</a><a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/shops">Cửa hàng</a></div>
-    </div>
-    <div class="row g-3">
-        <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Danh mục</div><div class="display-6">${categoryCount}</div></div></div></div>
-        <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Shop chờ duyệt</div><div class="display-6">${pendingShopCount}</div><a href="${pageContext.request.contextPath}/manager/shops?status=PENDING">Xem danh sách</a></div></div></div>
-        <div class="col-md-4"><div class="card shadow-sm"><div class="card-body"><div class="text-muted">Đơn hàng</div><div class="display-6">-</div><small class="text-muted">Sẽ nối với module Order ở đợt tích hợp</small></div></div></div>
-    </div>
-</main>
-</body>
-</html>
+<%@ page contentType="text/html;charset=UTF-8" %><%@ taglib prefix="c" uri="jakarta.tags.core" %><%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %><%@ include file="fragments/header.jsp" %>
+<h1 class="h3">Bảng điều khiển Manager / Admin</h1><p>Đơn và doanh thu từ đầu tháng đến hôm nay.</p><div class="row g-3">
+<div class="col-md-4"><div class="card card-body shadow-sm">Người dùng<strong class="fs-3"><fmt:formatNumber value="${report.users()}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Shop<strong class="fs-3"><fmt:formatNumber value="${report.shops()}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Sản phẩm<strong class="fs-3"><fmt:formatNumber value="${report.products()}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Đơn tháng này<strong class="fs-3"><fmt:formatNumber value="${report.orders()}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Doanh thu đã giao (VND)<strong class="fs-3"><fmt:formatNumber value="${report.deliveredRevenue()}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Shop chờ duyệt<strong class="fs-3"><fmt:formatNumber value="${pendingShopCount}"/></strong></div></div>
+<div class="col-md-4"><div class="card card-body shadow-sm">Danh mục<strong class="fs-3"><fmt:formatNumber value="${categoryCount}"/></strong></div></div></div><a class="btn btn-primary mt-4" href="${pageContext.request.contextPath}/manager/reports">Xem / Xuất báo cáo</a>
+<%@ include file="fragments/footer.jsp" %>

@@ -12,6 +12,7 @@
 <c:url var="loginUrl" value="/login"/>
 <c:url var="registerUrl" value="/register"/>
 <c:url var="logoutUrl" value="/logout"/>
+<c:url var="notificationsUrl" value="/notifications"/>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -27,8 +28,10 @@
           rel="stylesheet">
 </head>
 <body>
+<c:if test="${not empty pageContext.request.userPrincipal}"><script src="${pageContext.request.contextPath}/js/notifications.js" defer></script></c:if>
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
     <div class="container">
+<c:if test="${not empty pageContext.request.userPrincipal}"><a class="text-white" href="${notificationsUrl}">Thông báo <span id="notification-count" class="badge bg-dark"></span></a></c:if>
         <a class="navbar-brand fw-bold" href="${homeUrl}">
             <i class="bi bi-flower1"></i> StarShop
         </a>

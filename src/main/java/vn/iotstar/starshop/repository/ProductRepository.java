@@ -12,6 +12,10 @@ import vn.iotstar.starshop.entity.Product;
 public interface ProductRepository
         extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select p from Product p where p.id = :id")
+    Optional<Product> findForModeration(Long id);
+
     Optional<Product> findByIdAndShopIdAndShopOwnerId(
             Long productId,
             Long shopId,

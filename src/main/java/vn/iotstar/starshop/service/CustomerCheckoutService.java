@@ -37,6 +37,8 @@ import vn.iotstar.starshop.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class CustomerCheckoutService {
+    private final vn.iotstar.starshop.service.NotificationService notifications;
+
 
     private final UserRepository userRepository;
     private final CustomerCartRepository cartRepository;
@@ -148,6 +150,7 @@ public class CustomerCheckoutService {
                 }
             }
             orderIds.add(order.getId());
+            notifications.orderChanged(order);
         }
 
         cartItemRepository.deleteAll(items);

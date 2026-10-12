@@ -250,7 +250,9 @@ class GuestPageTests {
         assertThat(couponPage.statusCode())
                 .as(couponPage.body()).isEqualTo(200);
         assertThat(couponPage.body()).contains(
-                "Mã giảm giá dùng được", "PAGE10", "10.000");
+                "Mã giảm giá dùng được", "PAGE10");
+        // Dấu phân nhóm phụ thuộc locale data của bản JDK trên máy chạy.
+        assertThat(couponPage.body()).containsPattern("10[.,]000");
 
         Long orderId = checkoutService.placeOrder(
                 user.getEmail(), address.getId(), provider.getId(),

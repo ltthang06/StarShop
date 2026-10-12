@@ -16,11 +16,13 @@ public class ManagerDashboardController {
 
     private final CategoryService categoryService;
     private final ManagerShopService shopService;
+    private final vn.iotstar.starshop.service.ManagerReportService reports;
 
     @GetMapping
     public String dashboard(Model model) {
         model.addAttribute("categoryCount", categoryService.count());
         model.addAttribute("pendingShopCount", shopService.countPending());
+        model.addAttribute("report", reports.report(null, null));
         return "manager/dashboard";
     }
 }

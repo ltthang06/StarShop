@@ -12,6 +12,7 @@ import vn.iotstar.starshop.repository.*;
 import vn.iotstar.starshop.service.ManagerOperationsService;
 @Service @RequiredArgsConstructor
 public class ManagerOperationsServiceImpl implements ManagerOperationsService {
+    private final vn.iotstar.starshop.service.NotificationService notifications;
     private final ManagerUserRepository users;
     private final ShippingProviderRepository providers;
     private final ManagerOrderRepository orders;
@@ -77,5 +78,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
         order.setShippingProvider(provider);
         order.setStatus(OrderStatus.ASSIGNED);
         orders.save(order);
+        notifications.orderChanged(order);
+        notifications.send(shipper, "Phân công giao hàng", "Đơn #" + orderId, "/shipper");
     }
 }

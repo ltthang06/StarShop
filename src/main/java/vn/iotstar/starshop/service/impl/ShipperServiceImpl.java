@@ -19,6 +19,7 @@ import vn.iotstar.starshop.service.ShipperService;
 @Service
 @RequiredArgsConstructor
 public class ShipperServiceImpl implements ShipperService {
+    private final vn.iotstar.starshop.service.NotificationService notifications;
 
     private final ShipperAssignmentRepository shipperAssignmentRepository;
     private final OrderRepository orderRepository;
@@ -75,7 +76,7 @@ public class ShipperServiceImpl implements ShipperService {
                 shipperId
         );
 
-        Order order = assignment.getOrder();
+        Order order = orderRepository.findForUpdate(assignment.getOrder().getId()).orElseThrow();
 
         OrderStatus currentStatus = order.getStatus();
 
@@ -100,12 +101,16 @@ public class ShipperServiceImpl implements ShipperService {
         }
 
         if (newStatus == OrderStatus.DELIVERED) {
+            if (order.getPaymentMethod() == vn.iotstar.starshop.enums.PaymentMethod.COD) {
+                order.setPaymentStatus(vn.iotstar.starshop.enums.PaymentStatus.PAID);
+            }
             assignment.setDeliveredAt(
                     LocalDateTime.now()
             );
         }
 
         orderRepository.save(order);
+        notifications.orderChanged(order);
         shipperAssignmentRepository.save(assignment);
     }
 

@@ -48,7 +48,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityUserRepository users)
             throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
@@ -77,8 +77,11 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/products", "GET"),
                         new AntPathRequestMatcher("/products/**", "GET")
                 ).permitAll()
-                .requestMatchers(paths("/manager/**"))
+                .requestMatchers(paths("/manager/users/*/roles")).hasRole("ADMIN")
+                .requestMatchers(paths("/manager", "/manager/**"))
                 .hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(paths("/admin/**"))
+                .hasRole("ADMIN")
                 .requestMatchers(paths("/shipper/**"))
                 .hasAnyRole("SHIPPER", "ADMIN")
                 .requestMatchers(paths("/vendor/**"))
@@ -95,6 +98,8 @@ public class SecurityConfig {
                 .permitAll()
         );
 
+        http.addFilterAfter(new ActiveAccountFilter(users),
+                org.springframework.security.web.authentication.AnonymousAuthenticationFilter.class);
         return http.build();
     }
 

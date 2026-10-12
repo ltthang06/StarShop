@@ -28,7 +28,7 @@ import vn.iotstar.starshop.repository.RoleRepository;
 import vn.iotstar.starshop.repository.ManagerShopRepository;
 import vn.iotstar.starshop.repository.SecurityUserRepository;
 
-@SpringBootTest
+@SpringBootTest(properties="starshop.sitemesh.enabled=false")
 @AutoConfigureMockMvc
 class ManagerSecurityTests {
 
