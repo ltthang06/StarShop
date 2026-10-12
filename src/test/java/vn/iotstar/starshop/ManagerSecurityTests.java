@@ -69,7 +69,7 @@ class ManagerSecurityTests {
         manager.getRoles().add(managerRole);
         userRepository.save(manager);
 
-        mockMvc.perform(formLogin().user(manager.getEmail()).password("test-password"))
+        mockMvc.perform(formLogin().user("email", manager.getEmail()).password("test-password"))
                 .andExpect(authenticated().withRoles("MANAGER"));
     }
 

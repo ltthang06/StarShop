@@ -23,17 +23,38 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     public CloudinaryUploadResult uploadImage(MultipartFile file)
             throws IOException {
 
+        return upload(file, "image", "starshop/products");
+    }
+
+    @Override
+    public CloudinaryUploadResult uploadReviewImage(MultipartFile file)
+            throws IOException {
+
+        return upload(file, "image", "starshop/reviews");
+    }
+
+    @Override
+    public CloudinaryUploadResult uploadReviewVideo(MultipartFile file)
+            throws IOException {
+
+        return upload(file, "video", "starshop/reviews");
+    }
+
+    private CloudinaryUploadResult upload(
+            MultipartFile file, String type, String folder)
+            throws IOException {
+
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException(
-                    "File ảnh không được để trống"
+                    "Tệp tải lên không được để trống"
             );
         }
 
         Map<?, ?> result = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
-                        "folder", "starshop/products",
-                        "resource_type", "image"
+                        "folder", folder,
+                        "resource_type", type
                 )
         );
 

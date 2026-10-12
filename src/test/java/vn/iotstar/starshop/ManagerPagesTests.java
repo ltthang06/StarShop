@@ -29,7 +29,7 @@ class ManagerPagesTests {
         String login=client.send(HttpRequest.newBuilder(URI.create(root+"/login")).GET().build(),HttpResponse.BodyHandlers.ofString()).body();
         var matcher=Pattern.compile("name=\\x22_csrf\\x22[^>]*value=\\x22([^\\x22]+)\\x22").matcher(login);
         assertTrue(matcher.find(), "Login CSRF field must exist");
-        String body="username="+URLEncoder.encode(manager.getEmail(),StandardCharsets.UTF_8)
+        String body="email="+URLEncoder.encode(manager.getEmail(),StandardCharsets.UTF_8)
             +"&password=page-password&_csrf="+URLEncoder.encode(matcher.group(1),StandardCharsets.UTF_8);
         var response=client.send(HttpRequest.newBuilder(URI.create(root+"/login"))
             .header("Content-Type","application/x-www-form-urlencoded").POST(HttpRequest.BodyPublishers.ofString(body)).build(),
