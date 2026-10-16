@@ -24,4 +24,5 @@ public interface ProductImageRepository
                     Long productId);
 
     long countByProductId(Long productId);
+    List<ProductImage> findByProductIdInOrderByPrimaryImageDescIdAsc(java.util.Collection<Long> productIds);
 }

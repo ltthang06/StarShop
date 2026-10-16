@@ -17,6 +17,8 @@ import vn.iotstar.starshop.repository.ProductModerationRepository;
 public class ManagerCatalogController {
     private final ManagerCatalogService service;
     private final ProductModerationRepository moderations;
+    private final vn.iotstar.starshop.repository.ManagerShopRepository shops;
+    private final vn.iotstar.starshop.repository.ProductImageRepository images;
 
     @GetMapping("/products")
     public String products(@RequestParam(defaultValue="") String keyword, @RequestParam(required=false) Long shopId,
@@ -27,7 +29,25 @@ public class ManagerCatalogController {
         model.addAttribute("selectedStatus",status); model.addAttribute("statuses",ProductStatus.values());
         model.addAttribute("moderations",moderations.findAllById(result.stream().map(p -> p.getId()).toList()).stream().collect(
             java.util.stream.Collectors.toMap(m -> m.getProductId(), m -> m)));
+        model.addAttribute("shopOptions", shops.findAllByOrderByNameAsc());
+        var thumbnails = new java.util.HashMap<Long, String>();
+        var ids = result.stream().map(p -> p.getId()).toList();
+        if (!ids.isEmpty()) images.findByProductIdInOrderByPrimaryImageDescIdAsc(ids)
+                .forEach(image -> thumbnails.putIfAbsent(image.getProduct().getId(), image.getImageUrl()));
+        model.addAttribute("thumbnails", thumbnails);
         return "manager/products";
+    }
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("product", service.product(id));
+            model.addAttribute("images", images.findByProductIdOrderByPrimaryImageDescIdAsc(id));
+            model.addAttribute("moderation", moderations.findById(id).orElse(null));
+            return "manager/product-detail";
+        } catch (IllegalArgumentException ex) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND, ex.getMessage());
+        }
     }
     @PostMapping("/products/{id}/moderate")
     public String moderate(@PathVariable Long id, @RequestParam boolean blocked,

@@ -17,6 +17,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     private final ShippingProviderRepository providers;
     private final ManagerOrderRepository orders;
     private final ShipperAssignmentRepository assignments;
+    private final OrderDetailRepository details;
 
     @Override @Transactional(readOnly=true)
     public Page<User> users(String keyword, int page) {
@@ -80,5 +81,20 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
         orders.save(order);
         notifications.orderChanged(order);
         notifications.send(shipper, "Phân công giao hàng", "Đơn #" + orderId, "/shipper");
+    }
+
+    @Override @Transactional(readOnly=true)
+    public vn.iotstar.starshop.dto.ManagerOrderView orderDetail(Long id) {
+        var order = orders.findDetailedById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+        var lines = details.findByOrderIdOrderByIdAsc(id).stream()
+                .map(line -> new vn.iotstar.starshop.dto.ManagerOrderView.Line(
+                        line.getProduct().getId(), line.getProduct().getName(),
+                        line.getQuantity(), line.getUnitPrice(), line.getSubtotal())).toList();
+        var assigned = assignments.findByOrder_Id(id).orElse(null);
+        return new vn.iotstar.starshop.dto.ManagerOrderView(order, lines,
+                assigned == null ? null : assigned.getShipper().getFullName(),
+                assigned == null ? null : assigned.getShipper().getEmail(),
+                assigned == null ? null : assigned.getAssignedAt());
     }
 }

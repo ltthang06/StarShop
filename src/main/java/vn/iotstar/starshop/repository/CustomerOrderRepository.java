@@ -18,6 +18,10 @@ public interface CustomerOrderRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = "shop")
     Page<Order> findByUserId(Long userId, Pageable pageable);
 
+    @EntityGraph(attributePaths = "shop")
+    Page<Order> findByUserIdAndStatus(Long userId,
+            vn.iotstar.starshop.enums.OrderStatus status, Pageable pageable);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT o FROM Order o WHERE o.id = :id AND o.user.id = :userId")
     Optional<Order> findOwnedForUpdate(

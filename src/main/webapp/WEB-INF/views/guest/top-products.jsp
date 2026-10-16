@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -47,7 +48,7 @@
                                  alt="<c:out value='${product.name}'/>">
                             <div class="card-body d-flex flex-column">
                                 <span class="badge bg-danger align-self-start mb-2">
-                                    #${rank.count}
+                                    #${rankingPage.number * rankingPage.size + rank.count}
                                 </span>
                                 <small class="text-muted">
                                     <c:out value="${product.categoryName}"/>
@@ -62,12 +63,10 @@
                                 <p class="price mt-auto">
                                     <c:choose>
                                         <c:when test="${not empty product.discountPrice}">
-                                            <fmt:formatNumber value="${product.discountPrice}"
-                                                              maxFractionDigits="0"/> đ
+                                            <shop:money value="${product.discountPrice}"/>
                                         </c:when>
                                         <c:otherwise>
-                                            <fmt:formatNumber value="${product.price}"
-                                                              maxFractionDigits="0"/> đ
+                                            <shop:money value="${product.price}"/>
                                         </c:otherwise>
                                     </c:choose>
                                 </p>
@@ -81,6 +80,17 @@
             </div>
         </c:otherwise>
     </c:choose>
+    <nav class="d-flex justify-content-between align-items-center mt-4" aria-label="Phân trang Top 20">
+        <c:choose><c:when test="${rankingPage.hasPrevious()}">
+            <c:url var="rankPrev" value="/products/top"><c:param name="sort" value="${sort}"/><c:param name="page" value="${rankingPage.number - 1}"/></c:url>
+            <a class="btn btn-outline-danger" href="${rankPrev}">Trang trước</a>
+        </c:when><c:otherwise><span></span></c:otherwise></c:choose>
+        <span>Trang ${rankingPage.number + 1} / ${rankingPage.totalPages == 0 ? 1 : rankingPage.totalPages}</span>
+        <c:choose><c:when test="${rankingPage.hasNext()}">
+            <c:url var="rankNext" value="/products/top"><c:param name="sort" value="${sort}"/><c:param name="page" value="${rankingPage.number + 1}"/></c:url>
+            <a class="btn btn-outline-danger" href="${rankNext}">Trang sau</a>
+        </c:when><c:otherwise><span></span></c:otherwise></c:choose>
+    </nav>
 </main>
 
 <%@ include file="../common/footer.jsp" %>

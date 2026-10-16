@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -33,12 +34,10 @@
                                 <p class="price mt-auto">
                                     <c:choose>
                                         <c:when test="${not empty product.discountPrice}">
-                                            <fmt:formatNumber value="${product.discountPrice}"
-                                                              maxFractionDigits="0"/> đ
+                                            <shop:money value="${product.discountPrice}"/>
                                         </c:when>
                                         <c:otherwise>
-                                            <fmt:formatNumber value="${product.price}"
-                                                              maxFractionDigits="0"/> đ
+                                            <shop:money value="${product.price}"/>
                                         </c:otherwise>
                                     </c:choose>
                                 </p>

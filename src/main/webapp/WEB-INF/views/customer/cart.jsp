@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -40,8 +41,7 @@
                                         <c:out value="${item.productName}"/>
                                     </a>
                                     <div class="text-muted">
-                                        <fmt:formatNumber value="${item.unitPrice}"
-                                                          maxFractionDigits="0"/> đ
+                                        <shop:money value="${item.unitPrice}"/>
                                     </div>
                                     <c:if test="${not item.available}">
                                         <div class="text-danger">Sản phẩm không đủ hàng hoặc đã ngừng bán.</div>
@@ -58,8 +58,7 @@
                                     </form>
                                 </div>
                                 <div class="text-end">
-                                    <strong><fmt:formatNumber value="${item.subtotal}"
-                                                              maxFractionDigits="0"/> đ</strong>
+                                    <strong><shop:money value="${item.subtotal}"/></strong>
                                     <form action="${deleteUrl}" method="post" class="mt-2">
                                         <input type="hidden" name="${_csrf.parameterName}"
                                                value="${_csrf.token}">
@@ -76,8 +75,7 @@
                         <div class="card-body">
                             <h2 class="h5">Tạm tính</h2>
                             <p class="fs-4 fw-bold text-danger">
-                                <fmt:formatNumber value="${cart.subtotal}"
-                                                  maxFractionDigits="0"/> đ
+                                <shop:money value="${cart.subtotal}"/>
                             </p>
                             <p class="text-muted">Phí giao hàng được tính khi chọn đơn vị vận chuyển.</p>
                             <c:if test="${cart.readyToCheckout}">

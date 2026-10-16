@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -42,8 +43,7 @@
                             <option value="${provider.id}"
                                     ${provider.id eq selectedProvider.id ? 'selected' : ''}>
                                 <c:out value="${provider.name}"/> ·
-                                <fmt:formatNumber value="${provider.baseFee}"
-                                                  maxFractionDigits="0"/> đ / shop
+                                <shop:money value="${provider.baseFee}"/> / shop
                             </option>
                         </c:forEach>
                     </select>
@@ -79,8 +79,7 @@
                                         </div>
                                     </c:if>
                                     <div class="small text-danger">
-                                        Giảm <fmt:formatNumber value="${voucher.discountAmount}"
-                                                               maxFractionDigits="0"/> đ
+                                        Giảm <shop:money value="${voucher.discountAmount}"/>
                                     </div>
                                 </div>
                                 <form action="${checkoutUrl}" method="get" class="m-0">
@@ -155,25 +154,21 @@
                     <h2 class="h5">Tóm tắt đơn hàng</h2>
                     <p>Sản phẩm: ${cart.lines.size()} món</p>
                     <p>Tạm tính:
-                        <fmt:formatNumber value="${cart.subtotal}"
-                                          maxFractionDigits="0"/> đ
+                        <shop:money value="${cart.subtotal}"/>
                     </p>
                     <c:if test="${not empty quote}">
                         <p>Phí giao hàng:
-                            <fmt:formatNumber value="${quote.shippingFee}"
-                                              maxFractionDigits="0"/> đ
+                            <shop:money value="${quote.shippingFee}"/>
                         </p>
                         <p>Giảm giá:
-                            <fmt:formatNumber value="${quote.discountAmount}"
-                                              maxFractionDigits="0"/> đ
+                            <shop:money value="${quote.discountAmount}"/>
                         </p>
                     </c:if>
                     <hr>
                     <p class="fs-5 fw-bold text-danger">
                         Tổng cộng:
                         <c:if test="${not empty quote}">
-                            <fmt:formatNumber value="${quote.totalAmount}"
-                                              maxFractionDigits="0"/> đ
+                            <shop:money value="${quote.totalAmount}"/>
                         </c:if>
                     </p>
                     <p class="small text-muted mb-0">

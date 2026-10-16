@@ -22,10 +22,13 @@ public class CustomerOrderController {
     public String history(
             Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) vn.iotstar.starshop.enums.OrderStatus status,
             Model model) {
 
         model.addAttribute("orders", orderService.history(
-                authentication.getName(), page));
+                authentication.getName(), status, page));
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("statuses", vn.iotstar.starshop.enums.OrderStatus.values());
         return "customer/orders";
     }
 

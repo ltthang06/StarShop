@@ -58,6 +58,18 @@ public class CustomerCatalogService {
         ).stream().map(this::toCard).toList();
     }
 
+    public Page<PublicProductCard> top20(String sort, int page) {
+        // Giới hạn bảng xếp hạng ở 20 sản phẩm rồi chia trang; không lấy các hạng 21+.
+        List<PublicProductCard> ranked = top20(sort);
+        int size = 8;
+        int lastPage = Math.max(0, (ranked.size() - 1) / size);
+        int current = Math.min(Math.max(0, page), lastPage);
+        int start = current * size;
+        return new org.springframework.data.domain.PageImpl<>(
+                ranked.subList(start, Math.min(start + size, ranked.size())),
+                PageRequest.of(current, size), ranked.size());
+    }
+
     public Page<PublicProductCard> search(
             String keyword, Long categoryId, String sort, int page) {
 

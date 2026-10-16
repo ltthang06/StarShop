@@ -24,6 +24,8 @@ class ManagerPagesTests {
     @Autowired ManagerShopRepository shops;
     @Autowired CategoryRepository categories;
     @Autowired ProductRepository products;
+    @Autowired OrderRepository orders;
+    @Autowired OrderDetailRepository orderDetails;
     @Test void managementJspPagesRenderAfterLogin() throws Exception {
         Role role=roles.findByName(RoleName.MANAGER).orElseGet(() -> {Role r=new Role();r.setName(RoleName.MANAGER);return roles.save(r);});
         User manager=new User(); manager.setFullName("Page Test"); manager.setEmail(UUID.randomUUID()+"@example.test");
@@ -39,6 +41,12 @@ class ManagerPagesTests {
         promo.setName("Page voucher");promo.setType(PromotionType.FREE_SHIPPING);promo.setQuantity(10);
         promo.setStartAt(java.time.LocalDateTime.now().minusHours(1));promo.setEndAt(java.time.LocalDateTime.now().plusDays(1));
         Long promotionId=catalog.savePromotion(null,promo).getId();
+        Order order=new Order();order.setUser(manager);order.setShop(shop);
+        order.setReceiverName("Page buyer");order.setReceiverPhone("0900000000");order.setShippingAddress("Page address");
+        order.setSubtotal(new java.math.BigDecimal("100000"));order.setTotalAmount(new java.math.BigDecimal("100000"));
+        order.setPaymentMethod(PaymentMethod.COD);order=orders.save(order);
+        OrderDetail line=new OrderDetail();line.setOrder(order);line.setProduct(product);line.setQuantity(1);
+        line.setUnitPrice(new java.math.BigDecimal("100000"));line.setSubtotal(new java.math.BigDecimal("100000"));orderDetails.save(line);
         var client=HttpClient.newBuilder().cookieHandler(new CookieManager(null,CookiePolicy.ACCEPT_ALL)).build();
         String root="http://localhost:"+port;
         String login=client.send(HttpRequest.newBuilder(URI.create(root+"/login")).GET().build(),HttpResponse.BodyHandlers.ofString()).body();
@@ -51,12 +59,24 @@ class ManagerPagesTests {
             HttpResponse.BodyHandlers.ofString());
         assertEquals(302,response.statusCode());
         for(String page : new String[]{"/manager","/manager/users","/manager/shipping-providers","/manager/orders","/manager/shops","/manager/categories/new","/manager/products","/manager/promotions","/manager/promotions/new","/manager/reports","/notifications",
-                "/manager/users/"+manager.getId(),"/manager/shops/"+shop.getId(),"/manager/promotions/"+promotionId+"/edit"}) {
+                "/manager/users/"+manager.getId(),"/manager/shops/"+shop.getId(),"/manager/promotions/"+promotionId+"/edit",
+                "/manager/orders/"+order.getId(),"/manager/products/"+product.getId()}) {
             var result=client.send(HttpRequest.newBuilder(URI.create(root+page)).GET().build(),HttpResponse.BodyHandlers.ofString());
             assertEquals(200,result.statusCode(),page);
             assertTrue(result.body().contains("StarShop"),page);
             if(page.startsWith("/manager")) assertTrue(result.body().contains("manager-layout-footer"),"SiteMesh decorator: "+page);
+            if(page.equals("/manager/orders/"+order.getId())) {
+                assertTrue(result.body().contains("100.000 ₫"),"Money format on order detail");
+                assertTrue(result.body().contains("Page flower"),"Order line product");
+            }
         }
+        for(String missing: new String[]{"/manager/orders/9223372036854775807","/manager/products/9223372036854775807",
+                "/manager/categories/9223372036854775807/edit","/manager/shipping-providers?edit=9223372036854775807"}) {
+            assertEquals(404,client.send(HttpRequest.newBuilder(URI.create(root+missing)).GET().build(),HttpResponse.BodyHandlers.ofString()).statusCode());
+        }
+        var invalidFilter=client.send(HttpRequest.newBuilder(URI.create(root+"/manager/orders?status=UNKNOWN")).GET().build(),HttpResponse.BodyHandlers.ofString());
+        assertEquals(400,invalidFilter.statusCode());
+        assertTrue(invalidFilter.body().contains("Thông số tìm kiếm không hợp lệ"));
         var received=new java.util.concurrent.CountDownLatch(1);
         var ready=new java.util.concurrent.CountDownLatch(1);
         var socket=client.newWebSocketBuilder().buildAsync(URI.create("ws://localhost:"+port+"/ws/notifications"),

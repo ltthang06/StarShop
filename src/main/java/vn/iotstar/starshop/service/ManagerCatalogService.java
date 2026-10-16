@@ -51,6 +51,12 @@ public class ManagerCatalogService {
     }
 
     @Transactional(readOnly=true)
+    public Product product(Long id) {
+        return products.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm"));
+    }
+
+    @Transactional(readOnly=true)
     public Page<Promotion> promotions(String keyword, int page) {
         String pattern = "%" + (keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT)) + "%";
         Specification<Promotion> spec = (root, query, cb) -> cb.and(

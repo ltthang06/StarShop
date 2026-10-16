@@ -43,9 +43,12 @@ public class CustomerProductController {
     @GetMapping("/products/top")
     public String top20(
             @RequestParam(defaultValue = "newest") String sort,
+            @RequestParam(defaultValue = "0") int page,
             Model model) {
 
-        model.addAttribute("products", catalogService.top20(sort));
+        var ranked = catalogService.top20(sort, page);
+        model.addAttribute("products", ranked.getContent());
+        model.addAttribute("rankingPage", ranked);
         model.addAttribute("sort", sort);
         return "guest/top-products";
     }

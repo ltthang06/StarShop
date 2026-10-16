@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -8,6 +9,16 @@
 
 <main class="container py-5">
     <h1 class="section-title">Đơn hàng của tôi</h1>
+    <form method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-sm-8 col-md-5"><label class="form-label" for="history-status">Trạng thái đơn</label>
+            <select name="status" id="history-status" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                <c:forEach items="${statuses}" var="state"><option value="${state}" ${selectedStatus == state ? 'selected' : ''}>${viewFormat.label(state)}</option></c:forEach>
+            </select>
+        </div>
+        <div class="col-auto"><button class="btn btn-starshop">Lọc đơn hàng</button>
+            <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/orders">Đặt lại</a></div>
+    </form>
 
     <c:if test="${not empty successMessage}">
         <div class="alert alert-success"><c:out value="${successMessage}"/></div>
@@ -18,7 +29,7 @@
 
     <c:choose>
         <c:when test="${empty orders.content}">
-            <p class="text-muted">Chưa có đơn hàng nào.</p>
+            <p class="text-muted">Không có đơn hàng phù hợp.</p>
             <a class="btn btn-starshop" href="${productsUrl}">Xem sản phẩm</a>
         </c:when>
         <c:otherwise>
@@ -30,7 +41,7 @@
                         <span>
                             Đơn #${order.id} · <c:out value="${order.shopName}"/>
                         </span>
-                        <strong><c:out value="${order.status}"/></strong>
+                        <shop:status value="${order.status}"/>
                     </div>
                     <div class="card-body">
                         <p class="text-muted mb-2">
@@ -51,18 +62,15 @@
                                     </c:if>
                                 </span>
                                 <span>
-                                    <fmt:formatNumber value="${line.subtotal}"
-                                                      maxFractionDigits="0"/> đ
+                                    <shop:money value="${line.subtotal}"/>
                                 </span>
                             </div>
                         </c:forEach>
                         <p class="mt-3 mb-1">Phí giao hàng:
-                            <fmt:formatNumber value="${order.shippingFee}"
-                                              maxFractionDigits="0"/> đ
+                            <shop:money value="${order.shippingFee}"/>
                         </p>
                         <p class="mb-3 fw-bold text-danger">Tổng cộng:
-                            <fmt:formatNumber value="${order.totalAmount}"
-                                              maxFractionDigits="0"/> đ
+                            <shop:money value="${order.totalAmount}"/>
                         </p>
                         <c:if test="${order.canCancel}">
                             <form action="${cancelUrl}" method="post">
@@ -88,6 +96,7 @@
                 <c:if test="${not orders.first}">
                     <c:url var="previousUrl" value="/orders">
                         <c:param name="page" value="${orders.number - 1}"/>
+                        <c:param name="status" value="${selectedStatus}"/>
                     </c:url>
                     <a href="${previousUrl}" class="btn btn-outline-danger">
                         Trang trước
@@ -97,6 +106,7 @@
                 <c:if test="${not orders.last}">
                     <c:url var="nextUrl" value="/orders">
                         <c:param name="page" value="${orders.number + 1}"/>
+                        <c:param name="status" value="${selectedStatus}"/>
                     </c:url>
                     <a href="${nextUrl}" class="btn btn-outline-danger">
                         Trang sau

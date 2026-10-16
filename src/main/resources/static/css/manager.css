@@ -1,0 +1,21 @@
+.manager-navbar { background: #222831; }
+.manager-navbar .navbar-brand { font-weight: 700; letter-spacing: -.025em; }
+.manager-brand-mark { background: #c73550; color: white; border-radius: .65rem; padding: .25rem .6rem; margin-right: .5rem; }
+.manager-menu { display: flex; gap: .15rem; flex-wrap: wrap; align-items: center; }
+.manager-menu .nav-link { color: #e5e7eb; padding: .6rem .65rem; border-radius: .5rem; text-decoration: none; }
+.manager-menu .nav-link:hover, .manager-menu .nav-link.active { color: white; background: #414b59; }
+.manager-menu .nav-link.active { box-shadow: inset 0 -2px #f0a2b0; }
+.manager-menu-toggle { display: none; }
+.manager-content { min-height: 65vh; }
+.manager-content .card { border-color: #e4e7ec; border-radius: .8rem; }
+.manager-content .form-label { font-weight: 500; }
+.manager-content .badge { white-space: normal; line-height: 1.4; }
+.manager-product-image { width: 112px; height: 112px; object-fit: cover; border-radius: .65rem; background: #f7eaf0; }
+.manager-content .table th { white-space: nowrap; color: #475467; }
+@media (max-width: 991.98px) {
+    .manager-menu-toggle { display: inline-flex; }
+    .manager-menu { display: none; width: 100%; padding-top: .75rem; }
+    .manager-menu.is-open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .manager-menu .nav-link { padding: .75rem; }
+}
+

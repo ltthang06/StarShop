@@ -5,6 +5,9 @@ import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import vn.iotstar.starshop.entity.Order;
 public interface ManagerOrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
+    @EntityGraph(attributePaths = {"user", "shop", "shippingProvider"})
+    @Query("select o from Order o where o.id = :id")
+    Optional<Order> findDetailedById(@Param("id") Long id);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from Order o where o.id = :id")
     Optional<Order> findForAssignment(@Param("id") Long id);

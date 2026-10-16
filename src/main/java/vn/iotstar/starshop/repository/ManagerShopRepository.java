@@ -15,6 +15,7 @@ import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.enums.ShopStatus;
 
 public interface ManagerShopRepository extends JpaRepository<Shop, Long> {
+    java.util.List<Shop> findAllByOrderByNameAsc();
 
     @EntityGraph(attributePaths = "owner")
     @Query("""

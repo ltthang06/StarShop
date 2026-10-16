@@ -64,6 +64,16 @@ public class ManagerOperationsController {
         return action(() -> {service.assign(id,shipperId,providerId,note); return "Đã phân công giao hàng";},
             "/manager/orders",redirect);
     }
+    @GetMapping("/orders/{id}")
+    public String orderDetail(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("detail", service.orderDetail(id));
+            return "manager/order-detail";
+        } catch (IllegalArgumentException ex) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
     private String action(Supplier<String> work, String path, RedirectAttributes redirect) {
         try {redirect.addFlashAttribute("success",work.get());}
         catch (IllegalArgumentException ex) {redirect.addFlashAttribute("error",ex.getMessage());}

@@ -42,12 +42,17 @@ public class CustomerOrderService {
 
     @Transactional(readOnly = true)
     public Page<CustomerOrderCard> history(String email, int page) {
+        return history(email, null, page);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CustomerOrderCard> history(String email, OrderStatus status, int page) {
         User user = currentUser(email);
-        return orderRepository.findByUserId(
-                user.getId(),
-                PageRequest.of(Math.max(page, 0), 10,
-                        Sort.by(Sort.Direction.DESC, "createdAt", "id"))
-        ).map(this::toCard);
+        var pageable = PageRequest.of(Math.max(page, 0), 10,
+                Sort.by(Sort.Direction.DESC, "createdAt", "id"));
+        return (status == null ? orderRepository.findByUserId(user.getId(), pageable)
+                : orderRepository.findByUserIdAndStatus(user.getId(), status, pageable))
+                .map(this::toCard);
     }
 
     @Transactional
