@@ -22,6 +22,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, length = 100)
+    @org.hibernate.annotations.Nationalized
     private String fullName;
 
     @Column(nullable = false, unique = true, length = 150)

@@ -18,6 +18,9 @@ import vn.iotstar.starshop.service.CloudinaryUploadResult;
 public class CloudinaryServiceImpl implements CloudinaryService {
 
     private final Cloudinary cloudinary;
+    @org.springframework.beans.factory.annotation.Value("${cloudinary.cloud-name:}") private String cloudName;
+    @org.springframework.beans.factory.annotation.Value("${cloudinary.api-key:}") private String apiKey;
+    @org.springframework.beans.factory.annotation.Value("${cloudinary.api-secret:}") private String apiSecret;
 
     @Override
     public CloudinaryUploadResult uploadImage(MultipartFile file)
@@ -50,6 +53,9 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             );
         }
 
+        if (cloudName.isBlank() || apiKey.isBlank() || apiSecret.isBlank()) {
+            throw new IOException("Chưa cấu hình Cloudinary để tải ảnh/video. Vui lòng liên hệ quản trị.");
+        }
         Map<?, ?> result = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(

@@ -27,6 +27,9 @@ public class OtpToken {
     @Column(nullable = false)
     private boolean used = false;
 
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private int failedAttempts = 0;
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

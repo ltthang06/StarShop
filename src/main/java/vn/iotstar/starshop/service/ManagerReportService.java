@@ -10,8 +10,8 @@ import vn.iotstar.starshop.enums.OrderStatus;
 import vn.iotstar.starshop.repository.*;
 @Service @RequiredArgsConstructor
 public class ManagerReportService {
+    private final ManagerAccessScope scope;
     private final ManagerUserRepository users;
-    private final ManagerShopRepository shops;
     private final ProductRepository products;
     private final ManagerReportRepository orders;
     @Transactional(readOnly=true)
@@ -20,13 +20,14 @@ public class ManagerReportService {
         LocalDate start=from == null ? end.withDayOfMonth(1) : from;
         if (start.isAfter(end) || start.isBefore(LocalDate.of(2000,1,1)) || end.isAfter(LocalDate.now()))
             throw new IllegalArgumentException("Chọn khoảng ngày từ năm 2000 đến hôm nay, ngày đầu không sau ngày cuối");
+        String managerEmail=scope.managerEmail();
         var status=new EnumMap<OrderStatus,Long>(OrderStatus.class);
         for (OrderStatus value: OrderStatus.values()) status.put(value,0L);
         var startAt=start.atStartOfDay(); var endAt=end.plusDays(1).atStartOfDay();
-        for (Object[] row: orders.statusCounts(startAt,endAt)) status.put((OrderStatus)row[0],(Long)row[1]);
-        BigDecimal revenue=orders.deliveredRevenue(startAt,endAt);
-        return new ManagerReport(start,end,users.count(),shops.count(),products.count(),
-            orders.countPeriod(startAt,endAt),revenue == null ? BigDecimal.ZERO : revenue,status);
+        for (Object[] row: orders.statusCounts(startAt,endAt,managerEmail)) status.put((OrderStatus)row[0],(Long)row[1]);
+        BigDecimal revenue=orders.deliveredRevenue(startAt,endAt,managerEmail);
+        return new ManagerReport(start,end,users.count(),scope.visibleShops().size(),products.count((root,query,cb) -> managerEmail==null ? cb.conjunction() : cb.equal(cb.lower(root.get("shop").get("manager").get("email")),managerEmail.toLowerCase(java.util.Locale.ROOT))),
+            orders.countPeriod(startAt,endAt,managerEmail),revenue == null ? BigDecimal.ZERO : revenue,status);
     }
     public String csv(ManagerReport report) {
         StringBuilder csv=new StringBuilder("\uFEFFChi tieu,Gia tri\r\n");

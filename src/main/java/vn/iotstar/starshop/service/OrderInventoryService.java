@@ -11,14 +11,18 @@ public class OrderInventoryService {
     private final ProductModerationRepository moderations;
     @Transactional
     public void restore(Long orderId) {
-        details.findByOrderIdOrderByIdAsc(orderId).stream()
-            .sorted(java.util.Comparator.comparing(d -> d.getProduct().getId()))
-            .forEach(detail -> {
-                var product=products.findForModeration(detail.getProduct().getId()).orElseThrow();
-                product.setQuantity(product.getQuantity()+detail.getQuantity());
-                product.setSoldCount(Math.max(0,product.getSoldCount()-detail.getQuantity()));
+        restoreMany(java.util.List.of(orderId));
+    }
+    @Transactional
+    public void restoreMany(java.util.List<Long> orderIds) {
+        var quantities=new java.util.TreeMap<Long,Integer>();
+        orderIds.forEach(id -> details.inventoryLines(id).forEach(line -> quantities.merge(line.getProductId(),line.getQuantity(),Integer::sum)));
+        quantities.forEach((id,quantity) -> {
+                var product=products.findForModeration(id).orElseThrow();
+                product.setQuantity(product.getQuantity()+quantity);
+                product.setSoldCount(Math.max(0,product.getSoldCount()-quantity));
                 if (product.getStatus()==ProductStatus.OUT_OF_STOCK && !moderations.existsByProductIdAndBlockedTrue(product.getId()))
                     product.setStatus(ProductStatus.ACTIVE);
-            });
+        });
     }
 }

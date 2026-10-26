@@ -76,7 +76,7 @@ public class CustomerAuthService {
         sendNewCode(user, "kích hoạt tài khoản");
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = OtpVerificationException.class)
     public void activate(String email, String code) {
         User user = findUser(email);
         if (user.getStatus() != UserStatus.INACTIVE) {
@@ -88,12 +88,12 @@ public class CustomerAuthService {
 
     @Transactional
     public void requestPasswordReset(String email) {
-        userRepository.findByEmailIgnoreCase(normalizeEmail(email))
+        userRepository.findForOtpUpdate(normalizeEmail(email))
                 .filter(user -> user.getStatus() == UserStatus.ACTIVE)
                 .ifPresent(user -> sendNewCode(user, "đặt lại mật khẩu"));
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = OtpVerificationException.class)
     public void resetPassword(
             String email,
             String code,
@@ -111,6 +111,10 @@ public class CustomerAuthService {
     }
 
     private void sendNewCode(User user, String purpose) {
+        otpRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()).ifPresent(previous -> {
+            if (previous.getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(60)))
+                throw new IllegalArgumentException("Vui lòng đợi 60 giây trước khi yêu cầu mã mới");
+        });
         otpRepository.findByUserIdAndUsedFalse(user.getId())
                 .forEach(token -> token.setUsed(true));
 
@@ -126,27 +130,32 @@ public class CustomerAuthService {
 
     private void useCode(User user, String code) {
         OtpToken token = otpRepository
-                .findFirstByUserIdAndUsedFalseOrderByCreatedAtDesc(
+                .findFirstByUserIdAndUsedFalseOrderByCreatedAtDescIdDesc(
                         user.getId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Mã xác thực không hợp lệ"));
 
-        if (code == null
-                || !token.getCode().equals(code.trim())
-                || token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Mã xác thực không hợp lệ");
+        if (!token.getExpiresAt().isAfter(LocalDateTime.now()) || token.getFailedAttempts() >= 5) {
+            token.setUsed(true);
+            throw new OtpVerificationException("Mã xác thực đã hết hiệu lực. Vui lòng yêu cầu mã mới");
+        }
+        if (code == null || !token.getCode().equals(code.trim())) {
+            token.setFailedAttempts(token.getFailedAttempts() + 1);
+            if (token.getFailedAttempts() >= 5) token.setUsed(true);
+            throw new OtpVerificationException("Mã xác thực không hợp lệ");
         }
         token.setUsed(true);
     }
 
     private User findUser(String email) {
-        return userRepository.findByEmailIgnoreCase(normalizeEmail(email))
+        return userRepository.findForOtpUpdate(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Không tìm thấy tài khoản"));
     }
 
     private String normalizeEmail(String email) {
-        if (email == null || !email.contains("@")) {
+        if (email == null || email.trim().length() > 150
+                || !email.trim().matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")) {
             throw new IllegalArgumentException("Email không hợp lệ");
         }
         return email.trim().toLowerCase(Locale.ROOT);
@@ -154,9 +163,9 @@ public class CustomerAuthService {
 
     private void validatePassword(String password, String confirmPassword) {
         if (password == null || password.length() < 8
-                || password.length() > 72) {
+                || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
             throw new IllegalArgumentException(
-                    "Mật khẩu phải dài từ 8 đến 72 ký tự");
+                    "Mật khẩu cần ít nhất 8 ký tự và tối đa 72 byte UTF-8");
         }
         if (!password.equals(confirmPassword)) {
             throw new IllegalArgumentException(

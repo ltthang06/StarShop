@@ -30,6 +30,7 @@ public class ShipperAssignment {
     private LocalDateTime deliveredAt;
 
     @Column(length = 500)
+    @org.hibernate.annotations.Nationalized
     private String note;
 
     @OneToOne(fetch = FetchType.LAZY)

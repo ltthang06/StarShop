@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 
@@ -23,12 +24,12 @@
         Chi tiết đơn hàng - StarShop
     </title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <shop:theme/>
 
 </head>
 
 <body class="bg-light">
+<shop:workspaceNav/>
 
 <div class="container py-5">
 
@@ -149,6 +150,8 @@
 
     </c:if>
 
+    <c:if test="${order.paymentMethod == 'VNPAY' and order.paymentStatus != 'PAID' and order.status == 'NEW'}"><div class="alert alert-info">Đang chờ xác minh thanh toán VNPAY. Chưa thể xác nhận xử lý đơn.</div></c:if>
+    <c:if test="${order.paymentMethod == 'VNPAY' and order.status == 'RETURNED'}"><div class="alert alert-warning">Giao dịch hoàn tiền online cần được quản trị đối soát trên cổng thanh toán.</div></c:if>
     <div class="row g-4">
 
         <div class="col-lg-7">
@@ -403,7 +406,7 @@
 
     <div class="mt-4 d-flex gap-2 flex-wrap">
 
-        <c:if test="${order.status == 'NEW'}">
+        <c:if test="${order.status == 'NEW' and (order.paymentMethod != 'VNPAY' or order.paymentStatus == 'PAID')}">
 
             <form method="post"
                   action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/orders/${order.id}/confirm">
@@ -443,8 +446,7 @@
 
         </c:if>
 
-        <c:if test="${order.status == 'NEW'
-                     || order.status == 'CONFIRMED'}">
+        <c:if test="${(order.status == 'NEW' || order.status == 'CONFIRMED') and order.paymentMethod != 'VNPAY'}">
 
             <form method="post"
                   action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/orders/${order.id}/cancel"
@@ -486,7 +488,7 @@
 
         </c:if>
 
-        <c:if test="${order.status == 'RETURNED'}">
+        <c:if test="${order.status == 'RETURNED' and order.paymentMethod != 'VNPAY'}">
 
             <form method="post"
                   action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/orders/${order.id}/refund"

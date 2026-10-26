@@ -91,8 +91,7 @@
                             </c:if>
                             <c:if test="${not empty review.videoUrl}">
                                 <video class="w-100" controls style="max-height: 360px">
-                                    <source src="<c:out value='${review.videoUrl}'/>"
-                                            type="video/mp4">
+                                    <source src="<c:out value='${review.videoUrl}'/>">
                                 </video>
                             </c:if>
                         </div>

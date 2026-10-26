@@ -13,4 +13,9 @@ public interface OtpTokenRepository extends JpaRepository<OtpToken, Long> {
 
     Optional<OtpToken> findFirstByUserIdAndUsedFalseOrderByCreatedAtDesc(
             Long userId);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    Optional<OtpToken> findFirstByUserIdAndUsedFalseOrderByCreatedAtDescIdDesc(Long userId);
+
+    Optional<OtpToken> findFirstByUserIdOrderByCreatedAtDesc(Long userId);
 }

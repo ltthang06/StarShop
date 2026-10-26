@@ -22,4 +22,6 @@ public class CustomerOrderCard {
     private List<CustomerOrderLine> lines;
     private boolean canCancel;
     private boolean canReturn;
+    private vn.iotstar.starshop.enums.PaymentMethod paymentMethod;
+    private vn.iotstar.starshop.enums.PaymentStatus paymentStatus;
 }

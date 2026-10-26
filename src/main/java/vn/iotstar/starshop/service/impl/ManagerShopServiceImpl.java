@@ -27,6 +27,7 @@ import vn.iotstar.starshop.service.ManagerShopService;
 @RequiredArgsConstructor
 public class ManagerShopServiceImpl implements ManagerShopService {
 
+    private final vn.iotstar.starshop.service.ManagerAccessScope scope;
     private final ManagerShopRepository shopRepository;
     private final CommissionRepository commissionRepository;
     private final RoleRepository roleRepository;
@@ -37,20 +38,27 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     public Page<Shop> search(String keyword, ShopStatus status, int page) {
         PageRequest pageable = PageRequest.of(Math.max(page, 0), 10,
                 Sort.by(Sort.Direction.DESC, "createdAt"));
-        return shopRepository.search(keyword == null ? "" : keyword.trim(), status, pageable);
+        String pattern="%"+(keyword==null ? "" : keyword.trim().toLowerCase(java.util.Locale.ROOT))+"%";
+        String email=scope.managerEmail();
+        return shopRepository.findAll((root,query,cb) -> {
+            var predicate=cb.or(cb.like(cb.lower(root.get("name")),pattern),cb.like(cb.lower(root.get("owner").get("email")),pattern));
+            if(status!=null) predicate=cb.and(predicate,cb.equal(root.get("status"),status));
+            if(email!=null) predicate=cb.and(predicate,cb.equal(cb.lower(root.get("manager").get("email")),email.toLowerCase(java.util.Locale.ROOT)));
+            return predicate;
+        },pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Shop findById(Long id) {
-        return shopRepository.findWithOwner(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cửa hàng"));
+        Shop shop=shopRepository.findWithOwner(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cửa hàng"));
+        scope.requireShop(shop); return shop;
     }
 
     @Override
     @Transactional(readOnly = true)
     public long countPending() {
-        return shopRepository.countByStatus(ShopStatus.PENDING);
+        return search("", ShopStatus.PENDING, 0).getTotalElements();
     }
 
     @Override
@@ -110,6 +118,7 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Commission> currentCommission(Long shopId) {
+        findById(shopId);
         return commissionRepository.findFirstByShopIdAndActiveTrueOrderByStartAtDesc(shopId);
     }
 
@@ -140,7 +149,7 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     }
 
     private Shop lockedShop(Long id) {
-        return shopRepository.findForUpdate(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cửa hàng"));
+        Shop shop=shopRepository.findForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cửa hàng"));
+        scope.requireShop(shop); return shop;
     }
 }

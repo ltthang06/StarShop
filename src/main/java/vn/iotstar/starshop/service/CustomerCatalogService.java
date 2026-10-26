@@ -30,36 +30,34 @@ public class CustomerCatalogService {
     private final ProductImageRepository imageRepository;
 
     public List<PublicProductCard> featured() {
-        return catalogRepository.findFeatured(
+        return toCards(catalogRepository.findFeatured(
                 ProductStatus.ACTIVE,
                 ShopStatus.ACTIVE,
                 PageRequest.of(0, 8)
-        ).stream().map(this::toCard).toList();
+        ));
     }
 
     public List<PublicProductCard> top20(String sort) {
         if ("favorites".equals(sort)) {
-            return catalogRepository.findMostWishlistedIds(
+            List<Long> rankedIds = catalogRepository.findMostWishlistedIds(
                     ProductStatus.ACTIVE,
                     ShopStatus.ACTIVE,
                     PageRequest.of(0, 20)
-            ).stream()
-                    .map(this::detail)
-                    .flatMap(Optional::stream)
-                    .toList();
+            );
+            return publicCards(rankedIds);
         }
 
-        return catalogRepository.search(
+        return toCards(catalogRepository.search(
                 ProductStatus.ACTIVE,
                 ShopStatus.ACTIVE,
                 "",
                 null,
                 PageRequest.of(0, 20, sortOrder(sort))
-        ).stream().map(this::toCard).toList();
+        ).getContent());
     }
 
     public Page<PublicProductCard> top20(String sort, int page) {
-        // Giới hạn bảng xếp hạng ở 20 sản phẩm rồi chia trang; không lấy các hạng 21+.
+
         List<PublicProductCard> ranked = top20(sort);
         int size = 8;
         int lastPage = Math.max(0, (ranked.size() - 1) / size);
@@ -75,13 +73,15 @@ public class CustomerCatalogService {
 
         String text = keyword == null ? "" : keyword.trim();
 
-        return catalogRepository.search(
+        Page<Product> result = catalogRepository.search(
                 ProductStatus.ACTIVE,
                 ShopStatus.ACTIVE,
                 text,
                 categoryId,
                 PageRequest.of(Math.max(page, 0), 12, sortOrder(sort))
-        ).map(this::toCard);
+        );
+        var cards = toCards(result.getContent());
+        return new org.springframework.data.domain.PageImpl<>(cards, result.getPageable(), result.getTotalElements());
     }
 
     public Optional<PublicProductCard> detail(Long id) {
@@ -96,6 +96,13 @@ public class CustomerCatalogService {
         return categoryRepository.findByActiveTrueOrderByNameAsc();
     }
 
+    public List<PublicProductCard> publicCards(List<Long> orderedIds) {
+        if (orderedIds.isEmpty()) return List.of();
+        var byId = catalogRepository.findPublicByIds(orderedIds, ProductStatus.ACTIVE, ShopStatus.ACTIVE)
+                .stream().collect(java.util.stream.Collectors.toMap(Product::getId, p -> p));
+        return toCards(orderedIds.stream().map(byId::get).filter(java.util.Objects::nonNull).toList());
+    }
+
     private Sort sortOrder(String sort) {
         if ("bestseller".equals(sort)) {
             return Sort.by(Sort.Direction.DESC, "soldCount", "id");
@@ -104,12 +111,22 @@ public class CustomerCatalogService {
             return Sort.by(Sort.Direction.DESC, "rating", "id");
         }
         if ("price-asc".equals(sort)) {
-            return Sort.by(Sort.Direction.ASC, "price", "id");
+            return Sort.by(Sort.Direction.ASC, "effectivePrice", "id");
         }
         if ("price-desc".equals(sort)) {
-            return Sort.by(Sort.Direction.DESC, "price", "id");
+            return Sort.by(Sort.Direction.DESC, "effectivePrice", "id");
         }
         return Sort.by(Sort.Direction.DESC, "createdAt", "id");
+    }
+
+    private List<PublicProductCard> toCards(List<Product> products) {
+        if (products.isEmpty()) return List.of();
+        var urls = new java.util.HashMap<Long, String>();
+
+        imageRepository.findByProductIdInOrderByPrimaryImageDescIdAsc(
+                products.stream().map(Product::getId).toList())
+                .forEach(image -> urls.putIfAbsent(image.getProduct().getId(), image.getImageUrl()));
+        return products.stream().map(p -> toCard(p, urls.get(p.getId()))).toList();
     }
 
     private PublicProductCard toCard(Product product) {
@@ -119,6 +136,10 @@ public class CustomerCatalogService {
                 .map(ProductImage::getImageUrl)
                 .orElse(null);
 
+        return toCard(product, imageUrl);
+    }
+
+    private PublicProductCard toCard(Product product, String imageUrl) {
         return new PublicProductCard(
                 product.getId(),
                 product.getName(),

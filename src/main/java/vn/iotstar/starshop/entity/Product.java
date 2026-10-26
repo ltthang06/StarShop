@@ -32,6 +32,9 @@ public class Product {
     @Column(precision = 15, scale = 2)
     private BigDecimal discountPrice;
 
+    @org.hibernate.annotations.Formula("coalesce(discount_price, price)")
+    private BigDecimal effectivePrice;
+
     @Column(nullable = false)
     private int quantity;
 

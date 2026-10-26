@@ -15,6 +15,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     private final vn.iotstar.starshop.service.NotificationService notifications;
     private final ManagerUserRepository users;
     private final ShippingProviderRepository providers;
+    private final vn.iotstar.starshop.service.ManagerAccessScope scope;
     private final ManagerOrderRepository orders;
     private final ShipperAssignmentRepository assignments;
     private final OrderDetailRepository details;
@@ -59,11 +60,14 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     @Override @Transactional(readOnly=true)
     public Page<Order> orders(OrderStatus status, int page) {
         Specification<Order> spec = (root, query, cb) -> status == null ? cb.conjunction() : cb.equal(root.get("status"),status);
+        String managerEmail=scope.managerEmail();
+        if(managerEmail!=null) spec=spec.and((root,query,cb) -> cb.equal(cb.lower(root.get("shop").get("manager").get("email")),managerEmail.toLowerCase(java.util.Locale.ROOT)));
         return orders.findAll(spec, PageRequest.of(Math.max(0,page),10,Sort.by("createdAt").descending()));
     }
     @Override @Transactional
     public void assign(Long orderId, Long shipperId, Long providerId, String note) {
         Order order = orders.findForAssignment(orderId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+        scope.requireShop(order.getShop());
         if (order.getStatus() != OrderStatus.READY_FOR_PICKUP || assignments.findByOrder_Id(orderId).isPresent())
             throw new IllegalArgumentException("Chỉ phân công đơn sẵn sàng lấy hàng và chưa có shipper");
         User shipper = users.findById(shipperId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy shipper"));
@@ -87,6 +91,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     public vn.iotstar.starshop.dto.ManagerOrderView orderDetail(Long id) {
         var order = orders.findDetailedById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+        scope.requireShop(order.getShop());
         var lines = details.findByOrderIdOrderByIdAsc(id).stream()
                 .map(line -> new vn.iotstar.starshop.dto.ManagerOrderView.Line(
                         line.getProduct().getId(), line.getProduct().getName(),

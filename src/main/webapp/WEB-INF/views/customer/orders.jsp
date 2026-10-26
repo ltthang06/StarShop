@@ -72,6 +72,8 @@
                         <p class="mb-3 fw-bold text-danger">Tổng cộng:
                             <shop:money value="${order.totalAmount}"/>
                         </p>
+                        <p><shop:status value="${order.paymentMethod}"/> <shop:status value="${order.paymentStatus}"/></p>
+                        <c:if test="${order.paymentMethod == 'VNPAY'}"><p><a href="${pageContext.request.contextPath}/payments/orders/${order.id}">Xem giao dịch VNPAY</a></p></c:if>
                         <c:if test="${order.canCancel}">
                             <form action="${cancelUrl}" method="post">
                                 <input type="hidden" name="${_csrf.parameterName}"

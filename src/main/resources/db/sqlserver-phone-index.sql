@@ -1,5 +1,3 @@
--- SQL Server cho phép nhiều phone NULL bằng filtered unique index.
--- Không thay đổi dữ liệu hay ràng buộc email.
 SET QUOTED_IDENTIFIER ON;
 SET ANSI_NULLS ON;
 SET ANSI_PADDING ON;

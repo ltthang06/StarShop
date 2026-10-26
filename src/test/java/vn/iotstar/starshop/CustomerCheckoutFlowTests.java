@@ -91,6 +91,39 @@ class CustomerCheckoutFlowTests {
     private CustomerPromotionService promotionService;
 
     @Test
+    void simultaneousCheckoutCreatesOnlyOneOrderAndReservesStockOnce() throws Exception {
+        String id=java.util.UUID.randomUUID().toString();
+        User buyer=createUser(id+"@example.test",null);
+        Category category=new Category();category.setName("Concurrent "+id);category=categoryRepository.save(category);
+        Product product=createProduct(buyer,category,"Concurrent flower",10);
+        Address address=new Address();address.setUser(buyer);address.setRecipientName("Buyer");address.setPhone("0900000000");address.setAddressLine("Test address");address=addressRepository.save(address);
+        ShippingProvider provider=new ShippingProvider();provider.setName("Concurrent "+id);provider.setBaseFee(BigDecimal.valueOf(15000));provider=providerRepository.save(provider);
+        cartService.add(buyer.getEmail(),product.getId(),2);
+        Long addressId=address.getId(),providerId=provider.getId();
+        var ready=new java.util.concurrent.CountDownLatch(2);
+        var start=new java.util.concurrent.CountDownLatch(1);
+        var executor=java.util.concurrent.Executors.newFixedThreadPool(2);
+        try {
+            java.util.concurrent.Callable<Boolean> submit=() -> {
+                ready.countDown();
+                if(!start.await(10,java.util.concurrent.TimeUnit.SECONDS)) throw new IllegalStateException("Start timed out");
+                try { checkoutService.placeOrder(buyer.getEmail(),addressId,providerId,"",null);return true; }
+                catch(IllegalArgumentException ex) {
+                    assertThat(ex.getMessage()).isEqualTo("Giỏ hàng đang trống");return false;
+                }
+            };
+            var first=executor.submit(submit);var second=executor.submit(submit);
+            assertThat(ready.await(10,java.util.concurrent.TimeUnit.SECONDS)).isTrue();start.countDown();
+            assertThat(List.of(first.get(20,java.util.concurrent.TimeUnit.SECONDS),second.get(20,java.util.concurrent.TimeUnit.SECONDS)))
+                    .containsExactlyInAnyOrder(true,false);
+            var reloaded=productRepository.findById(product.getId()).orElseThrow();
+            assertThat(reloaded.getQuantity()).isEqualTo(8);
+            assertThat(reloaded.getSoldCount()).isEqualTo(2);
+            assertThat(customerOrderService.history(buyer.getEmail(),0).getTotalElements()).isEqualTo(1);
+        } finally { start.countDown();executor.shutdownNow(); }
+    }
+
+    @Test
     void checkoutSplitsOrdersByShopAndReservesStock() throws Exception {
         User customer = createUser("checkout@example.com", "0900000021");
         User firstVendor = createUser("vendor-one@example.com", "0900000022");

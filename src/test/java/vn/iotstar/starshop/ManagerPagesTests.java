@@ -31,7 +31,7 @@ class ManagerPagesTests {
         User manager=new User(); manager.setFullName("Page Test"); manager.setEmail(UUID.randomUUID()+"@example.test");
         manager.setPassword(encoder.encode("page-password")); manager.setStatus(UserStatus.ACTIVE); manager.getRoles().add(role);
         users.save(manager);
-        Shop shop=new Shop();shop.setName("Page shop");shop.setOwner(manager);shop=shops.save(shop);
+        Shop shop=new Shop();shop.setName("Page shop");shop.setOwner(manager);shop.setManager(manager);shop=shops.save(shop);
         Category category=new Category();category.setName("Page category");category=categories.save(category);
         Product product=new Product();product.setName("Page flower");product.setDescription("Page test product");
         product.setPrice(new java.math.BigDecimal("100000"));product.setQuantity(2);product.setShop(shop);product.setCategory(category);

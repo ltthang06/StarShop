@@ -18,6 +18,10 @@ public class JwtTokenService {
     public Map<String,Object> issue(String email,String password) {
         var auth=apiAuthenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(email,password));
         UserDetails user=users.loadUserByUsername(auth.getName());
+        if (!user.isEnabled() || !user.isAccountNonLocked()
+                || (auth.getPrincipal() instanceof vn.iotstar.starshop.config.StarShopPrincipal principal
+                    && !principal.matchesCredential(user.getPassword())))
+            throw new BadCredentialsException("Tài khoản đã thay đổi. Vui lòng đăng nhập lại");
         Instant now=Instant.now();
         var claims=JwtClaimsSet.builder().issuer("starshop").subject(user.getUsername()).issuedAt(now)
             .expiresAt(now.plusSeconds(900)).claim("credential",fingerprint(user.getPassword())).build();

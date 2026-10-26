@@ -56,7 +56,7 @@ public class JwtConfig {
                 if(!account.isEnabled() || !account.isAccountNonLocked()
                     || !vn.iotstar.starshop.service.JwtTokenService.fingerprint(account.getPassword()).equals(token.getClaimAsString("credential")))
                     throw new BadCredentialsException("Tài khoản hoặc token không còn hợp lệ");
-                // Quyền được đọc lại từ DB để khóa tài khoản/thay đổi quyền có hiệu lực ngay với API.
+
                 return new JwtAuthenticationToken(token,account.getAuthorities(),account.getUsername());
             })));
         return http.build();

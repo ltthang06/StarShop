@@ -19,6 +19,24 @@ import vn.iotstar.starshop.enums.ShopStatus;
 
 public interface CustomerCatalogRepository extends JpaRepository<Product, Long> {
 
+    @EntityGraph(attributePaths = {"category", "shop"})
+    @Query("SELECT p FROM Product p WHERE p.status = vn.iotstar.starshop.enums.ProductStatus.ACTIVE "
+            + "AND p.shop.status = vn.iotstar.starshop.enums.ShopStatus.ACTIVE "
+            + "AND p.category.active = true AND p.quantity > 0 ORDER BY p.soldCount DESC, p.id DESC")
+    List<Product> findChatCatalog(Pageable pageable);
+
+
+    @EntityGraph(attributePaths = "category")
+    @Query("""
+            SELECT p FROM Product p
+            WHERE p.id IN :ids AND p.status = :productStatus
+              AND p.shop.status = :shopStatus AND p.category.active = true
+              AND p.quantity > 0
+            """)
+    List<Product> findPublicByIds(@Param("ids") java.util.Collection<Long> ids,
+            @Param("productStatus") ProductStatus productStatus,
+            @Param("shopStatus") ShopStatus shopStatus);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Product p WHERE p.id = :id")
     Optional<Product> findByIdForUpdate(@Param("id") Long id);

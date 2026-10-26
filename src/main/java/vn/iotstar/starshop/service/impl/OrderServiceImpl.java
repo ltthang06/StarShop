@@ -173,6 +173,8 @@ public class OrderServiceImpl implements OrderService {
                 ownerId
         );
 
+        if(order.getPaymentMethod()==vn.iotstar.starshop.enums.PaymentMethod.VNPAY && order.getPaymentStatus()!=PaymentStatus.PAID)
+            throw new IllegalArgumentException("Cần xác nhận thanh toán VNPAY trước khi xử lý đơn");
         if (order.getStatus()
                 != OrderStatus.NEW) {
 
@@ -231,6 +233,8 @@ public class OrderServiceImpl implements OrderService {
                 ownerId
         );
 
+        if(order.getPaymentMethod()==vn.iotstar.starshop.enums.PaymentMethod.VNPAY)
+            throw new IllegalArgumentException("Đơn VNPAY phải được đối soát trước khi hủy hoặc hoàn tiền");
         if (order.getStatus()
                 != OrderStatus.NEW
                 && order.getStatus()
@@ -294,6 +298,8 @@ public class OrderServiceImpl implements OrderService {
                 ownerId
         );
 
+        if(order.getPaymentMethod()==vn.iotstar.starshop.enums.PaymentMethod.VNPAY)
+            throw new IllegalArgumentException("Hoàn tiền VNPAY cần thực hiện và xác minh qua cổng thanh toán; chưa thể ghi nhận hoàn tiền tự động");
         if (order.getStatus()
                 != OrderStatus.RETURNED) {
 

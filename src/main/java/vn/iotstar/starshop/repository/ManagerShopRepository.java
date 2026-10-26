@@ -14,7 +14,8 @@ import jakarta.persistence.LockModeType;
 import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.enums.ShopStatus;
 
-public interface ManagerShopRepository extends JpaRepository<Shop, Long> {
+public interface ManagerShopRepository extends JpaRepository<Shop, Long>, org.springframework.data.jpa.repository.JpaSpecificationExecutor<Shop> {
+    java.util.List<Shop> findByManager_EmailIgnoreCaseOrderByNameAsc(String email);
     java.util.List<Shop> findAllByOrderByNameAsc();
 
     @EntityGraph(attributePaths = "owner")

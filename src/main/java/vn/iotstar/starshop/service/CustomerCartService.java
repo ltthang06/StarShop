@@ -61,7 +61,7 @@ public class CustomerCartService {
         if (quantity < 1 || quantity > 99) {
             throw new IllegalArgumentException("Số lượng phải từ 1 đến 99");
         }
-        User user = currentUser(email);
+        User user = lockedUser(email);
         Product product = publicProduct(productId);
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
@@ -86,7 +86,7 @@ public class CustomerCartService {
 
     @Transactional
     public void update(String email, Long itemId, int quantity) {
-        User user = currentUser(email);
+        User user = lockedUser(email);
         CartItem item = ownedItem(user.getId(), itemId);
         Product product = publicProduct(item.getProduct().getId());
         validateQuantity(quantity, product.getQuantity());
@@ -95,7 +95,7 @@ public class CustomerCartService {
 
     @Transactional
     public void remove(String email, Long itemId) {
-        User user = currentUser(email);
+        User user = lockedUser(email);
         cartItemRepository.delete(ownedItem(user.getId(), itemId));
     }
 
@@ -123,6 +123,11 @@ public class CustomerCartService {
                 price.multiply(BigDecimal.valueOf(item.getQuantity())),
                 available
         );
+    }
+
+    private User lockedUser(String email) {
+        return userRepository.findByEmailForUpdate(email)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản"));
     }
 
     private User currentUser(String email) {

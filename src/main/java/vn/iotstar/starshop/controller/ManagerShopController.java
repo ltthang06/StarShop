@@ -21,6 +21,7 @@ import vn.iotstar.starshop.service.ManagerShopService;
 public class ManagerShopController {
 
     private final ManagerShopService shopService;
+    private final vn.iotstar.starshop.service.ShopManagerAssignmentService managerAssignments;
 
     @GetMapping
     public String list(@RequestParam(defaultValue = "") String keyword,
@@ -34,10 +35,17 @@ public class ManagerShopController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Model model, jakarta.servlet.http.HttpServletRequest request) {
         model.addAttribute("shop", shopService.findById(id));
         model.addAttribute("commission", shopService.currentCommission(id).orElse(null));
+        if(request.isUserInRole("ADMIN")) model.addAttribute("managerCandidates",managerAssignments.candidates());
         return "manager/shop-detail";
+    }
+
+    @PostMapping("/{id}/manager")
+    public String assignManager(@PathVariable Long id, @RequestParam(required=false) Long managerId,
+            RedirectAttributes redirect) {
+        return changeStatus(id,redirect,() -> managerAssignments.assign(id,managerId),"Đã cập nhật quản lý cửa hàng");
     }
 
     @PostMapping("/{id}/approve")

@@ -134,7 +134,9 @@
 
                 <div class="card shadow-sm mb-3">
                     <div class="card-body">
-                        <h2 class="h5">Thanh toán khi nhận hàng (COD)</h2>
+                        <h2 class="h5">Phương thức thanh toán</h2>
+                        <div class="form-check mb-2"><input class="form-check-input" id="payment-cod" type="radio" name="paymentMethod" value="COD" checked><label class="form-check-label" for="payment-cod">Thanh toán khi nhận hàng (COD)</label></div>
+                        <c:if test="${vnpayAvailable}"><div class="form-check mb-3"><input class="form-check-input" id="payment-vnpay" type="radio" name="paymentMethod" value="VNPAY"><label class="form-check-label" for="payment-vnpay">VNPAY Sandbox — thanh toán thử nghiệm</label></div></c:if>
                         <label class="form-label" for="note">Ghi chú</label>
                         <textarea class="form-control" id="note" name="note"
                                   rows="3" maxlength="500"></textarea>

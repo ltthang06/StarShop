@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>StarShop · Quản trị</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <shop:theme/>
     <link href="${pageContext.request.contextPath}/css/manager.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -25,6 +25,7 @@
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/promotions">Voucher</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/shipping-providers">Vận chuyển</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/orders">Đơn hàng</a>
+            <c:if test="${pageContext.request.isUserInRole('ADMIN')}"><a class="nav-link" href="${pageContext.request.contextPath}/manager/payments">Đối soát thanh toán</a></c:if>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/reports">Báo cáo</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/notifications">Thông báo <span id="notification-count" class="badge bg-danger"></span></a>
             <a class="nav-link" href="${pageContext.request.contextPath}/">Trang chủ</a>

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ include file="fragments/header.jsp" %>
+<c:if test="${pageContext.request.isUserInRole('ADMIN')}"><a class="btn btn-outline-primary mb-3" href="${pageContext.request.contextPath}/manager/payments">Đối soát thanh toán VNPAY</a></c:if>
 <h1 class="h3">Theo dõi và phân công đơn hàng</h1>
 <p class="text-muted">Xem thông tin đơn và phân công giao hàng khi cửa hàng đã chuẩn bị xong.</p>
 <form method="get" class="row g-2 align-items-end mb-4">

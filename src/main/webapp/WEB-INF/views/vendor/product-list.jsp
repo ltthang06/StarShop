@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -17,8 +18,7 @@
 
     <title>Quản lý sản phẩm - StarShop</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <shop:theme/>
 
     <style>
         .product-thumbnail {
@@ -55,6 +55,7 @@
 </head>
 
 <body class="bg-light">
+<shop:workspaceNav/>
 
 <div class="container py-5">
 

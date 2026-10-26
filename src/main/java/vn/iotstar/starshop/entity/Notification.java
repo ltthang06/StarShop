@@ -19,9 +19,11 @@ public class Notification {
     private Long id;
 
     @Column(nullable = false, length = 200)
+    @org.hibernate.annotations.Nationalized
     private String title;
 
     @Column(nullable = false, length = 1000)
+    @org.hibernate.annotations.Nationalized
     private String content;
 
     @Column(length = 500)

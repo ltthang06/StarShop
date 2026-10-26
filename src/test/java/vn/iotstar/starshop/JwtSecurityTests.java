@@ -69,6 +69,28 @@ class JwtSecurityTests {
         mvc.perform(get("/manager").with(user(manager.getEmail()).roles("MANAGER")))
             .andExpect(status().isForbidden());
     }
+
+    @Test void realWebLoginSessionIsRevokedAfterPasswordChangesAndNewPasswordWorks() throws Exception {
+        User account=account(RoleName.USER);
+        var login=mvc.perform(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders
+                .formLogin().user("email",account.getEmail()).password("password"))
+                .andExpect(org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated())
+                .andReturn();
+        var session=(org.springframework.mock.web.MockHttpSession)login.getRequest().getSession(false);
+        var context=(org.springframework.security.core.context.SecurityContext)session.getAttribute("SPRING_SECURITY_CONTEXT");
+        var principal=(vn.iotstar.starshop.config.StarShopPrincipal)context.getAuthentication().getPrincipal();
+        org.junit.jupiter.api.Assertions.assertNull(principal.getPassword(),"Spring must erase password from the session principal");
+        mvc.perform(get("/profile").session(session)).andExpect(status().isOk());
+        account.setPassword(encoder.encode("changed-password"));users.save(account);
+        mvc.perform(get("/profile").session(session)).andExpect(status().isUnauthorized());
+        org.junit.jupiter.api.Assertions.assertTrue(session.isInvalid());
+        mvc.perform(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin()
+                .user("email",account.getEmail()).password("password"))
+                .andExpect(org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated());
+        mvc.perform(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin()
+                .user("email",account.getEmail()).password("changed-password"))
+                .andExpect(org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated());
+    }
     private User account(RoleName name) {
         Role role=roles.findByName(name).orElseGet(() -> {Role r=new Role();r.setName(name);return roles.save(r);});
         User u=new User();u.setEmail(UUID.randomUUID()+"@example.test");u.setFullName("JWT");

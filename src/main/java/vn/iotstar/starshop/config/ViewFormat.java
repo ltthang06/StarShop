@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
-/** Chỉ định dạng hiển thị; giữ nguyên giá trị enum và số tiền trong database. */
+
 @Component
 public class ViewFormat {
     public String money(Number value) {

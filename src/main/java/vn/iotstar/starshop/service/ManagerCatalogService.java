@@ -15,6 +15,7 @@ import vn.iotstar.starshop.repository.*;
 
 @Service @RequiredArgsConstructor
 public class ManagerCatalogService {
+    private final ManagerAccessScope scope;
     private final ProductRepository products;
     private final ProductModerationRepository moderations;
     private final PromotionRepository promotionCodes;
@@ -23,10 +24,12 @@ public class ManagerCatalogService {
     @Transactional(readOnly=true)
     public Page<Product> products(String keyword, Long shopId, ProductStatus status, int page) {
         String pattern = "%" + (keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT)) + "%";
+        String managerEmail=scope.managerEmail();
         Specification<Product> spec = (root, query, cb) -> {
             var predicate = cb.like(cb.lower(root.get("name")), pattern);
             if (shopId != null) predicate = cb.and(predicate, cb.equal(root.get("shop").get("id"), shopId));
             if (status != null) predicate = cb.and(predicate, cb.equal(root.get("status"), status));
+            if(managerEmail!=null) predicate=cb.and(predicate,cb.equal(cb.lower(root.get("shop").get("manager").get("email")),managerEmail.toLowerCase(Locale.ROOT)));
             return predicate;
         };
         return products.findAll(spec, PageRequest.of(Math.max(0,page), 10, Sort.by("id").descending()));
@@ -36,6 +39,7 @@ public class ManagerCatalogService {
     public void moderate(Long id, boolean blocked, String reason, String actor) {
         Product product = products.findForModeration(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm"));
+        scope.requireShop(product.getShop());
         String text = reason == null ? "" : reason.trim();
         if (text.length() > 500 || blocked && text.length() < 10)
             throw new IllegalArgumentException("Lý do khóa cần từ 10 đến 500 ký tự");
@@ -45,15 +49,17 @@ public class ManagerCatalogService {
         record.setProductId(id); record.setBlocked(blocked); record.setReason(text);
         record.setModeratorEmail(actor); record.setUpdatedAt(LocalDateTime.now());
         moderations.save(record);
-        // Mở kiểm duyệt giữ sản phẩm ẩn; Vendor tự kiểm tra nội dung rồi bật lại.
+
         product.setStatus(ProductStatus.INACTIVE);
         products.save(product);
     }
 
     @Transactional(readOnly=true)
     public Product product(Long id) {
-        return products.findById(id)
+        Product product=products.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm"));
+        scope.requireShop(product.getShop());
+        return product;
     }
 
     @Transactional(readOnly=true)

@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 
@@ -21,14 +22,14 @@
 
     <title>Thống kê doanh thu - StarShop</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <shop:theme/>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/vendor/chartjs/chart.umd.js"></script>
 
 </head>
 
 <body class="bg-light">
+<shop:workspaceNav/>
 
 <div class="container py-5">
 

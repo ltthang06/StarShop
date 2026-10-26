@@ -28,6 +28,8 @@ public class CustomerCheckoutController {
     private final CustomerCheckoutService checkoutService;
     private final CustomerShippingProviderRepository providerRepository;
     private final CustomerPromotionService promotionService;
+    private final vn.iotstar.starshop.config.VnpayProperties vnpay;
+    private final vn.iotstar.starshop.service.OnlineCheckoutService onlineCheckout;
 
     @GetMapping("/checkout")
     public String checkout(
@@ -42,6 +44,7 @@ public class CustomerCheckoutController {
         }
 
         model.addAttribute("cart", cart);
+        model.addAttribute("vnpayAvailable",vnpay.ready());
         model.addAttribute("addresses", accountService.addresses(
                 authentication.getName()));
         var providers = providerRepository
@@ -74,9 +77,15 @@ public class CustomerCheckoutController {
             @RequestParam Long providerId,
             @RequestParam(required = false) String note,
             @RequestParam(required = false) String code,
+            @RequestParam(defaultValue="COD") vn.iotstar.starshop.enums.PaymentMethod paymentMethod,
+            jakarta.servlet.http.HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
 
         try {
+            if(paymentMethod==vn.iotstar.starshop.enums.PaymentMethod.VNPAY) {
+                String reference=onlineCheckout.place(authentication.getName(),addressId,providerId,note,code,request.getRemoteAddr());
+                return "redirect:/payments/"+reference;
+            }
             List<Long> orderIds = checkoutService.placeOrder(
                     authentication.getName(), addressId, providerId,
                     note, code);

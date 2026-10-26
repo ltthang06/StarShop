@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -9,11 +10,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chi tiết cửa hàng - StarShop</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <shop:theme/>
 </head>
 
 <body class="bg-light">
+<shop:workspaceNav/>
 
 <div class="container py-5">
 
@@ -31,7 +32,7 @@
                 ${shop.name}
             </h2>
 
-            <table class="table">
+            <div class="table-responsive"><table class="table">
 
                 <tr>
                     <th width="220">Mã cửa hàng</th>
@@ -88,7 +89,7 @@
                     </td>
                 </tr>
 
-            </table>
+            </table></div>
 
             <div class="d-flex gap-2 flex-wrap">
                 <a href="${pageContext.request.contextPath}/vendor/shops/${shop.id}/edit"

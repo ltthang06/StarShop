@@ -2,7 +2,6 @@ package vn.iotstar.starshop.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -77,27 +76,23 @@ public class CustomerActivityService {
     @Transactional(readOnly = true)
     public List<PublicProductCard> wishlist(String email) {
         User user = currentUser(email);
-        return wishlistRepository
+        return catalogService.publicCards(wishlistRepository
                 .findByUserIdOrderByCreatedAtDesc(user.getId())
                 .stream()
-                .map(wishlist -> catalogService.detail(
-                        wishlist.getProduct().getId()))
-                .flatMap(Optional::stream)
-                .toList();
+                .map(wishlist -> wishlist.getProduct().getId())
+                .toList());
     }
 
     @Transactional(readOnly = true)
     public List<PublicProductCard> recentlyViewed(String email) {
         User user = currentUser(email);
-        return viewRepository
+        return catalogService.publicCards(viewRepository
                 .findByUserIdOrderByViewedAtDesc(
                         user.getId(),
                         PageRequest.of(0, 20))
                 .stream()
-                .map(view -> catalogService.detail(
-                        view.getProduct().getId()))
-                .flatMap(Optional::stream)
-                .toList();
+                .map(view -> view.getProduct().getId())
+                .toList());
     }
 
     private User currentUser(String email) {

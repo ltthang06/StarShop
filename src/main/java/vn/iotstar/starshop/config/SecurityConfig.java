@@ -38,12 +38,11 @@ public class SecurityConfig {
                     .map(role -> role.getName().name())
                     .toArray(String[]::new);
 
-            return User.withUsername(account.getEmail())
-                    .password(account.getPassword())
-                    .roles(roles)
-                    .disabled(account.getStatus() == UserStatus.INACTIVE)
-                    .accountLocked(account.getStatus() == UserStatus.LOCKED)
-                    .build();
+            return new StarShopPrincipal(account.getEmail(), account.getPassword(),
+                    account.getStatus() == UserStatus.ACTIVE,
+                    account.getStatus() != UserStatus.LOCKED,
+                    org.springframework.security.core.authority.AuthorityUtils.createAuthorityList(
+                            Arrays.stream(roles).map(role -> "ROLE_"+role).toArray(String[]::new)));
         };
     }
 
@@ -64,10 +63,13 @@ public class SecurityConfig {
                         "/verify-otp",
                         "/forgot-password",
                         "/reset-password",
+                        "/payments/vnpay/ipn",
+                        "/flower-chat",
                         "/shop/**",
                         "/error",
                         "/favicon.ico",
                         "/css/**",
+                        "/assets/**",
                         "/js/**",
                         "/images/**",
                         "/uploads/**",
@@ -77,7 +79,9 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/products", "GET"),
                         new AntPathRequestMatcher("/products/**", "GET")
                 ).permitAll()
+                .requestMatchers(paths("/manager/payments", "/manager/payments/**")).hasRole("ADMIN")
                 .requestMatchers(paths("/manager/users/*/roles")).hasRole("ADMIN")
+                .requestMatchers(paths("/manager/shops/*/manager")).hasRole("ADMIN")
                 .requestMatchers(paths("/manager", "/manager/**"))
                 .hasAnyRole("MANAGER", "ADMIN")
                 .requestMatchers(paths("/admin/**"))

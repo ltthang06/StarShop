@@ -23,15 +23,18 @@ public class Order {
     private Long id;
 
     @Column(nullable = false, length = 100)
+    @org.hibernate.annotations.Nationalized
     private String receiverName;
 
     @Column(nullable = false, length = 20)
     private String receiverPhone;
 
     @Column(nullable = false, length = 500)
+    @org.hibernate.annotations.Nationalized
     private String shippingAddress;
 
     @Column(length = 500)
+    @org.hibernate.annotations.Nationalized
     private String note;
 
     @Column(nullable = false, precision = 15, scale = 2)

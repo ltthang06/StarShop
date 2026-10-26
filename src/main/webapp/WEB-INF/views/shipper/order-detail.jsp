@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 
@@ -20,12 +21,12 @@
 
     <title>Chi tiết giao hàng - StarShop</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <shop:theme/>
 
 </head>
 
 <body class="bg-light">
+<shop:workspaceNav/>
 
 <div class="container py-5">
 
@@ -58,7 +59,7 @@
                 Đơn giao hàng #${order.id}
             </h2>
 
-            <table class="table table-bordered">
+            <div class="table-responsive"><table class="table table-bordered">
 
                 <tr>
                     <th width="300">
@@ -157,7 +158,7 @@
                     </td>
                 </tr>
 
-            </table>
+            </table></div>
 
             <c:if test="${order.status eq 'ASSIGNED'
                         or order.status eq 'PICKED_UP'

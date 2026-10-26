@@ -33,6 +33,8 @@ public class CustomerReviewService {
     private final OrderDetailRepository detailRepository;
     private final CustomerReviewRepository reviewRepository;
     private final CloudinaryService cloudinaryService;
+    private final vn.iotstar.starshop.repository.CustomerOrderRepository orderRepository;
+    private final vn.iotstar.starshop.repository.CustomerCatalogRepository productRepository;
 
     @Transactional(readOnly = true)
     public List<CustomerReviewCard> reviews(Long productId) {
@@ -53,7 +55,7 @@ public class CustomerReviewService {
     public CustomerReviewTarget target(
             String email, Long orderId, Long detailId) {
 
-        OrderDetail detail = reviewableDetail(email, orderId, detailId);
+        OrderDetail detail = reviewableDetail(email, orderId, detailId, false);
         return new CustomerReviewTarget(
                 orderId, detailId, detail.getProduct().getName());
     }
@@ -68,7 +70,8 @@ public class CustomerReviewService {
             MultipartFile image,
             MultipartFile video) throws IOException {
 
-        OrderDetail detail = reviewableDetail(email, orderId, detailId);
+
+        OrderDetail detail = reviewableDetail(email, orderId, detailId, true);
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Điểm đánh giá phải từ 1 đến 5");
         }
@@ -83,6 +86,10 @@ public class CustomerReviewService {
         validateFile(video, Set.of(
                 "video/mp4", "video/webm"), "Video");
 
+
+        Product product = productRepository.findByIdForUpdate(detail.getProduct().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm"));
+
         String imageUrl = null;
         String videoUrl = null;
         if (image != null && !image.isEmpty()) {
@@ -94,7 +101,7 @@ public class CustomerReviewService {
 
         Review review = new Review();
         review.setUser(detail.getOrder().getUser());
-        review.setProduct(detail.getProduct());
+        review.setProduct(product);
         review.setOrderDetail(detail);
         review.setRating(rating);
         review.setContent(text);
@@ -102,17 +109,18 @@ public class CustomerReviewService {
         review.setVideoUrl(videoUrl);
         reviewRepository.saveAndFlush(review);
 
-        Product product = detail.getProduct();
         product.setRating(reviewRepository.averageRating(
                 product.getId()));
     }
 
     private OrderDetail reviewableDetail(
-            String email, Long orderId, Long detailId) {
+            String email, Long orderId, Long detailId, boolean lock) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Không tìm thấy tài khoản"));
+        if (lock) orderRepository.findOwnedForUpdate(orderId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm trong đơn"));
         OrderDetail detail = detailRepository.findById(detailId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Không tìm thấy sản phẩm trong đơn"));

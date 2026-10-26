@@ -22,6 +22,7 @@ public class Review {
     private int rating;
 
     @Column(nullable = false, length = 2000)
+    @org.hibernate.annotations.Nationalized
     private String content;
 
     @Column(length = 500)

@@ -14,6 +14,9 @@ public interface CustomerReviewRepository extends JpaRepository<Review, Long> {
 
     boolean existsByOrderDetailId(Long orderDetailId);
 
+    @Query("SELECT r.orderDetail.id FROM Review r WHERE r.orderDetail.id IN :ids")
+    List<Long> reviewedDetailIds(@Param("ids") java.util.Collection<Long> ids);
+
     @EntityGraph(attributePaths = "user")
     List<Review> findByProductIdOrderByCreatedAtDesc(
             Long productId, Pageable pageable);

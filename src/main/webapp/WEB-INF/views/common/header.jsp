@@ -1,3 +1,4 @@
+<%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -20,9 +21,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StarShop - Cửa Hàng Hoa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    <shop:theme/>
+    <link href="${pageContext.request.contextPath}/assets/vendor/bootstrap-icons/bootstrap-icons.min.css"
           rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/style.css"
           rel="stylesheet">
@@ -80,6 +80,9 @@
                                 <li><a class="dropdown-item" href="${wishlistUrl}">Yêu thích</a></li>
                                 <li><a class="dropdown-item" href="${recentlyViewedUrl}">Đã xem</a></li>
                                 <li><a class="dropdown-item" href="${ordersUrl}">Đơn hàng</a></li>
+                                <c:if test="${pageContext.request.isUserInRole('USER') or pageContext.request.isUserInRole('VENDOR') or pageContext.request.isUserInRole('ADMIN')}"><li><a class="dropdown-item" href="${pageContext.request.contextPath}/vendor/dashboard">Cửa hàng của tôi</a></li></c:if>
+                                <c:if test="${pageContext.request.isUserInRole('MANAGER') or pageContext.request.isUserInRole('ADMIN')}"><li><a class="dropdown-item" href="${pageContext.request.contextPath}/manager">Quản trị</a></li></c:if>
+                                <c:if test="${pageContext.request.isUserInRole('SHIPPER') or pageContext.request.isUserInRole('ADMIN')}"><li><a class="dropdown-item" href="${pageContext.request.contextPath}/shipper">Giao hàng</a></li></c:if>
                                 <li><hr class="dropdown-divider"></li>
                                 <li class="px-3">
                                     <form action="${logoutUrl}" method="post">

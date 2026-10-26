@@ -54,8 +54,15 @@ public class CustomerCheckoutService {
     public List<Long> placeOrder(
             String email, Long addressId, Long providerId,
             String note, String code) {
+        return placeOrder(email,addressId,providerId,note,code,PaymentMethod.COD);
+    }
 
-        User user = userRepository.findByEmail(email)
+    @Transactional
+    public List<Long> placeOrder(String email,Long addressId,Long providerId,String note,String code,PaymentMethod method) {
+        if(method==null) throw new IllegalArgumentException("Chọn phương thức thanh toán");
+
+
+        User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Không tìm thấy tài khoản"));
         Address address = addressRepository.findByIdAndUserId(
@@ -125,7 +132,7 @@ public class CustomerCheckoutService {
             order.setDiscountAmount(discount);
             order.setTotalAmount(subtotal.add(provider.getBaseFee())
                     .subtract(discount));
-            order.setPaymentMethod(PaymentMethod.COD);
+            order.setPaymentMethod(method);
             order.setPaymentStatus(PaymentStatus.PENDING);
             order.setStatus(OrderStatus.NEW);
             order = orderRepository.save(order);

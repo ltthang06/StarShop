@@ -15,9 +15,9 @@ import vn.iotstar.starshop.repository.ProductModerationRepository;
 
 @Controller @RequiredArgsConstructor @RequestMapping("/manager")
 public class ManagerCatalogController {
+    private final vn.iotstar.starshop.service.ManagerAccessScope scope;
     private final ManagerCatalogService service;
     private final ProductModerationRepository moderations;
-    private final vn.iotstar.starshop.repository.ManagerShopRepository shops;
     private final vn.iotstar.starshop.repository.ProductImageRepository images;
 
     @GetMapping("/products")
@@ -29,7 +29,7 @@ public class ManagerCatalogController {
         model.addAttribute("selectedStatus",status); model.addAttribute("statuses",ProductStatus.values());
         model.addAttribute("moderations",moderations.findAllById(result.stream().map(p -> p.getId()).toList()).stream().collect(
             java.util.stream.Collectors.toMap(m -> m.getProductId(), m -> m)));
-        model.addAttribute("shopOptions", shops.findAllByOrderByNameAsc());
+        model.addAttribute("shopOptions", scope.visibleShops());
         var thumbnails = new java.util.HashMap<Long, String>();
         var ids = result.stream().map(p -> p.getId()).toList();
         if (!ids.isEmpty()) images.findByProductIdInOrderByPrimaryImageDescIdAsc(ids)

@@ -46,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
         saved.setName(normalizedName);
         saved.setDescription(category.getDescription());
         saved.setActive(category.isActive());
-        // The current form does not edit images; keep the image already stored.
+
         if (category.getId() == null) {
             saved.setImage(category.getImage());
         }

@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +39,42 @@ class CustomerAuthFlowTests {
 
     @MockBean
     private EmailOtpService emailOtpService;
+
+    @Autowired private vn.iotstar.starshop.service.CustomerAuthService auth;
+
+    @Test void wrongOtpAttemptsAreCommittedAndCannotBeReplayedAfterLimit() {
+        String email=java.util.UUID.randomUUID()+"@example.test";
+        auth.register("OTP limit",email,"password123","password123");
+        var user=userRepository.findByEmailIgnoreCase(email).orElseThrow();
+        var token=otpRepository.findFirstByUserIdAndUsedFalseOrderByCreatedAtDesc(user.getId()).orElseThrow();
+        String wrong=token.getCode().equals("000000") ? "111111" : "000000";
+        for(int i=1;i<=5;i++) {
+            assertThrows(IllegalArgumentException.class,() -> auth.activate(email,wrong));
+            var persisted=otpRepository.findById(token.getId()).orElseThrow();
+            assertEquals(i,persisted.getFailedAttempts());
+            assertEquals(i==5,persisted.isUsed());
+        }
+        assertThrows(IllegalArgumentException.class,() -> auth.activate(email,token.getCode()));
+        assertEquals(UserStatus.INACTIVE,userRepository.findByEmailIgnoreCase(email).orElseThrow().getStatus());
+        assertThrows(IllegalArgumentException.class,() -> auth.resendActivation(email));
+    }
+
+    @Test void expiredCodeIsConsumedAndResetCodeIsSingleUse() {
+        String email=java.util.UUID.randomUUID()+"@example.test";
+        auth.register("OTP reset",email,"password123","password123");
+        var user=userRepository.findByEmailIgnoreCase(email).orElseThrow();
+        var token=otpRepository.findFirstByUserIdAndUsedFalseOrderByCreatedAtDesc(user.getId()).orElseThrow();
+        token.setExpiresAt(java.time.LocalDateTime.now().minusMinutes(1));otpRepository.save(token);
+        assertThrows(IllegalArgumentException.class,() -> auth.activate(email,token.getCode()));
+        assertTrue(otpRepository.findById(token.getId()).orElseThrow().isUsed());
+        user.setStatus(UserStatus.ACTIVE);userRepository.save(user);
+        token.setCreatedAt(java.time.LocalDateTime.now().minusMinutes(2));otpRepository.save(token);
+        auth.requestPasswordReset(email);
+        var reset=otpRepository.findFirstByUserIdAndUsedFalseOrderByCreatedAtDesc(user.getId()).orElseThrow();
+        auth.resetPassword(email,reset.getCode(),"changed123","changed123");
+        assertThrows(IllegalArgumentException.class,() -> auth.resetPassword(email,reset.getCode(),"another123","another123"));
+        assertThrows(IllegalArgumentException.class,() -> auth.requestPasswordReset(email));
+    }
 
     @Test
     void customerCanRegisterActivateAndLogIn() throws Exception {

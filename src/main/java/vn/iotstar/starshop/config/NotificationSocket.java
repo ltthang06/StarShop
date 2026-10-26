@@ -13,7 +13,7 @@ public class NotificationSocket extends TextWebSocketHandler {
     private final Map<String,WebSocketSession> sessions=new ConcurrentHashMap<>();
     private final SecurityUserRepository users;
     @Override public void afterConnectionEstablished(WebSocketSession raw) throws Exception {
-        if (raw.getPrincipal()==null || !active(raw.getPrincipal().getName())) {raw.close(CloseStatus.POLICY_VIOLATION);return;}
+        if (!authorized(raw.getPrincipal())) {raw.close(CloseStatus.POLICY_VIOLATION);return;}
         sessions.put(raw.getId(),new ConcurrentWebSocketSessionDecorator(raw,5000,8192));
         raw.sendMessage(new TextMessage("{\"event\":\"ready\"}"));
     }
@@ -25,13 +25,20 @@ public class NotificationSocket extends TextWebSocketHandler {
         for (WebSocketSession session: sessions.values()) {
             if (session.getPrincipal()!=null && email.equalsIgnoreCase(session.getPrincipal().getName())) {
                 try {
-                    if (!active(email)) {session.close(CloseStatus.POLICY_VIOLATION);sessions.remove(session.getId());continue;}
+                    if (!authorized(session.getPrincipal())) {session.close(CloseStatus.POLICY_VIOLATION);sessions.remove(session.getId());continue;}
                     if (session.isOpen()) session.sendMessage(new TextMessage("{\"event\":\"notification\"}"));
                 } catch (Exception ex) {sessions.remove(session.getId());}
             }
         }
     }
-    private boolean active(String email) {
-        return users.findByEmailIgnoreCase(email).map(u -> u.getStatus()==UserStatus.ACTIVE).orElse(false);
+    private boolean authorized(java.security.Principal principal) {
+        if (principal==null) return false;
+        return users.findByEmailIgnoreCase(principal.getName()).map(u -> {
+            if (u.getStatus()!=UserStatus.ACTIVE) return false;
+            if (principal instanceof org.springframework.security.core.Authentication authentication
+                    && authentication.getPrincipal() instanceof StarShopPrincipal account)
+                return account.matchesCredential(u.getPassword());
+            return true;
+        }).orElse(false);
     }
 }

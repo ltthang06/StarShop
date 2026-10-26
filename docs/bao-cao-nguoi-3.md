@@ -1,6 +1,6 @@
 # Báo cáo Người 3 — Quản trị và tích hợp StarShop
 
-Ngày cập nhật: 12/10/2026. Nhánh: `feature/manager-admin`.
+Ngày cập nhật: 26/10/2026. Nhánh: `feature/manager-admin`.
 
 ## 1. Phạm vi và hiện trạng
 
@@ -35,7 +35,7 @@ Bảng mới `product_moderations` lưu ID sản phẩm, cờ khóa, lý do, ng�
 | Thông báo | /notifications | Chỉ xem/đánh dấu thông báo của chính mình |
 
 Không tự khóa tài khoản; không mở khóa INACTIVE thành ACTIVE; Manager không quản lý tài khoản Manager/Admin; chức năng khóa không khóa Admin.
-Admin có các chức năng Manager và thêm quyền cấp vai trò vận hành. Manager được quản lý nghiệp vụ toàn hệ thống; chưa có mô hình gán riêng Manager cho từng shop.
+Admin quản lý toàn hệ thống và cấp vai trò vận hành. Manager chỉ quản lý các shop được Admin phân công; service giới hạn cả truy cập trực tiếp qua ID.
 
 Sản phẩm bị kiểm duyệt chuyển INACTIVE. Vendor không thể sửa/bật lại khi cờ kiểm duyệt còn khóa. Mở kiểm duyệt vẫn giữ INACTIVE để Vendor tự kiểm tra và bật sản phẩm.
 
@@ -97,7 +97,7 @@ Các test bao gồm:
 - SQL Server: migration filtered phone index chạy trên database thử riêng, kiểm tra nhiều NULL và chặn trùng số đã nhập, chạy lại an toàn; database thử đã dọn.
 
 Luồng nghiệp vụ tự động dùng H2 ở chế độ MSSQLServer. Máy build hiện có Java 22; Maven target Java 17.
-Chưa chạy toàn ứng dụng qua JDBC SQL Server hoặc gửi email/upload Cloudinary thật do chưa có biến môi trường kết nối/dịch vụ.
+Ứng dụng đã chạy trên SQL Server. SMTP đã xác thực và gửi email tới chủ tài khoản; luồng nhập OTP thật cần người dùng nghiệm thu. Service Cloudinary đã upload ảnh và video thật thành công.
 Bản push nhánh cá nhân chưa phải bản demo main. Merge develop/main cần nhóm kiểm tra cấu hình và demo trên dữ liệu thật.
 
 ## 7. Hướng dẫn demo
@@ -118,3 +118,29 @@ Bản push nhánh cá nhân chưa phải bản demo main. Merge develop/main c�
 - Vì sao JWT không thay form login JSP? API dùng token; form web cần session và CSRF riêng.
 - Vì sao thông báo phát sau commit? Tránh báo đơn/thay đổi chưa được lưu thành công.
 - Vì sao filtered index cho phone? SQL Server UNIQUE thông thường chỉ cho một NULL; đăng ký bằng email chưa bắt buộc phone.
+
+## 9. Bổ sung hoàn thiện ngày 16/10/2026
+
+- Tạo database riêng `StarShopLocal` trên SQL Server của máy phát triển; chạy toàn ứng dụng bằng Microsoft JDBC thay H2 preview. Dữ liệu 50 sản phẩm được lưu trên SQL Server và nạp lại không trùng.
+- Thống nhất giao diện qua Bootswatch Litera 5.3.3 và các tag `theme.tag`, `workspaceNav.tag`. CSS/Bootstrap JS/giấy phép được lưu trong project; các khu vực vẫn có bố cục theo tác vụ.
+- Bổ sung trường `Shop.manager`, Admin phân công/gỡ Manager từ chi tiết shop. Manager chỉ truy cập cửa hàng, sản phẩm, đơn hàng và doanh thu thuộc shop được giao. Các API service kiểm tra cả truy cập trực tiếp bằng ID; không chỉ ẩn nút giao diện.
+- Có `ManagerShopScopeTests` kiểm tra đọc/sửa ngoài phạm vi, phân công chỉ dành Admin, báo cáo giới hạn theo Manager và Admin vẫn xem được toàn hệ thống.
+- Sửa `/vendor` chuyển tới dashboard, thêm liên kết theo vai trò từ tài khoản mua hàng và điều hướng workspace.
+- Tách SMTP/Cloudinary vào `.local/services.properties`, loại khỏi Git; ví dụ công khai không chứa khóa. Đã cấu hình riêng trên máy; SMTP và upload Cloudinary đã được kiểm tra kết nối thật.
+- Bổ sung hướng dẫn `van-hanh-local.md`, scripts thiết lập/chạy/kiểm tra local và báo cáo nội dung cho Người 1/Người 2. Báo cáo các thành viên cần điền họ tên, MSSV và ảnh minh chứng trước khi nộp.
+
+Các nhận định “chưa chạy toàn ứng dụng qua SQL Server” ở phần ghi nhận đợt trước được cập nhật bởi phần này. SMTP và Cloudinary đã được cấu hình và kiểm tra kết nối thật ngày 26/10/2026.
+
+## 10. Dữ liệu và nghiệm thu theo vai trò ngày 23/10/2026
+
+Đã bổ sung ba cửa hàng, phân bổ 50 sản phẩm, tài khoản Vendor/Manager theo chi nhánh, Shipper và khách hàng có nhiều địa chỉ. Hai nhà vận chuyển, ba voucher, chiết khấu shop và 13 đơn đủ các trạng thái được lưu trên SQL Server. Đơn tạo qua service, kiểm tra tách giỏ hai shop, giao hàng, đánh giá và hoàn trả; không gọi thanh toán/giao hàng ngoài ứng dụng.
+
+Đã đăng nhập từng vai trò trên ứng dụng SQL Server, kiểm tra các trang và giới hạn chi nhánh Manager. Full build có 44 kiểm thử đạt. Sau khi tắt khởi tạo và mở lại, dữ liệu vẫn giữ nguyên. Xem `du-lieu-van-hanh.md`; thông tin đăng nhập được giữ riêng ngoài Git.
+
+## 11. Thanh toán và dịch vụ ngày 26/10/2026
+
+- VNPAY Sandbox: đã thanh toán bằng thẻ thử NCB. Đơn #18 được tự động cập nhật PAID sau khi xác minh chữ ký, số tiền, mã merchant và trạng thái thành công trên Return URL. IPN và Return dùng chung cơ chế cập nhật chống xử lý lặp. Chưa xác nhận IPN công khai đã được VNPAY đăng ký và gọi thực tế.
+- Cloudinary: đã upload đủ 50 ảnh sản phẩm và một video kiểm tra bằng service Java. Kiểm tra 50/50 URL ảnh hợp lệ, cập nhật SQL Server và danh mục trong Git. Không đưa khóa vào repository.
+- SMTP: xác thực và gửi email thành công tới chủ tài khoản. Luồng nhận và nhập OTP đăng ký/quên mật khẩu thật cần chủ email nghiệm thu.
+- `mvn verify`: 69 kiểm thử, 0 thất bại, 0 lỗi. Đã đóng gói WAR và mở lại ứng dụng SQL Server.
+- Báo cáo các thành viên cần bổ sung họ tên, MSSV và ảnh minh chứng cá nhân trước khi nộp.
