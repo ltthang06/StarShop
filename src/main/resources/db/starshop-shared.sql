@@ -1128,19 +1128,19 @@ INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (7,3);
 
 SET IDENTITY_INSERT [dbo].[users] ON;
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (1,NULL,N'2026-10-16T13:38:24.7374480',N'admin@starshop.local',N'StarShop Admin',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (1,NULL,N'2026-10-16T13:38:24.7374480',N'admin@starshop.local',N'StarShop Admin',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (2,NULL,N'2026-10-23T23:29:54.5341860',N'manager.thuduc@starshop.local',N'Nguyễn Minh Anh',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (2,NULL,N'2026-10-23T23:29:54.5341860',N'manager.thuduc@starshop.local',N'Nguyễn Minh Anh',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (3,NULL,N'2026-10-23T23:29:54.6836360',N'manager.binhthanh@starshop.local',N'Trần Ngọc Linh',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (3,NULL,N'2026-10-23T23:29:54.6836360',N'manager.binhthanh@starshop.local',N'Trần Ngọc Linh',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (4,NULL,N'2026-10-23T23:29:54.7656380',N'vendor.thuduc@starshop.local',N'Lê Thanh Hà',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (4,NULL,N'2026-10-23T23:29:54.7656380',N'vendor.thuduc@starshop.local',N'Lê Thanh Hà',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (5,NULL,N'2026-10-23T23:29:54.8818930',N'vendor.binhthanh@starshop.local',N'Phạm Hoàng Nam',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (5,NULL,N'2026-10-23T23:29:54.8818930',N'vendor.binhthanh@starshop.local',N'Phạm Hoàng Nam',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (6,NULL,N'2026-10-23T23:29:55.0036400',N'shipper@starshop.local',N'Võ Thành Đạt',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (6,NULL,N'2026-10-23T23:29:55.0036400',N'shipper@starshop.local',N'Võ Thành Đạt',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (7,NULL,N'2026-10-23T23:29:55.1278630',N'customer@starshop.local',N'Nguyễn Khánh An',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (7,NULL,N'2026-10-23T23:29:55.1278630',N'user@starshop.local',N'Nguyễn Khánh An',N'$2a$10$rNHPWBQLFtIH/uZx05PLwueh8DUTpKsqnk43HjAShusDRc9NXucJy',NULL,N'ACTIVE');
 
 SET IDENTITY_INSERT [dbo].[users] OFF;
 
