@@ -15,7 +15,6 @@ import vn.iotstar.starshop.service.CategoryService;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final vn.iotstar.starshop.service.ManagerAccessScope scope;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public Category save(Category category) {
-        scope.requireAdmin();
         String normalizedName = category.getName().trim();
         boolean duplicated = category.getId() == null
                 ? categoryRepository.existsByNameIgnoreCase(normalizedName)
@@ -58,7 +56,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void toggleActive(Long id) {
-        scope.requireAdmin();
         Category category = findById(id);
         category.setActive(!category.isActive());
         categoryRepository.save(category);

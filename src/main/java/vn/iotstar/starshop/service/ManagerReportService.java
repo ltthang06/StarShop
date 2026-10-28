@@ -26,14 +26,13 @@ public class ManagerReportService {
         var startAt=start.atStartOfDay(); var endAt=end.plusDays(1).atStartOfDay();
         for (Object[] row: orders.statusCounts(startAt,endAt,managerEmail)) status.put((OrderStatus)row[0],(Long)row[1]);
         BigDecimal revenue=orders.deliveredRevenue(startAt,endAt,managerEmail);
-        long customerCount=managerEmail==null ? users.count() : orders.customersInPeriod(startAt,endAt,managerEmail);
-        return new ManagerReport(start,end,customerCount,scope.visibleShops().size(),products.count((root,query,cb) -> managerEmail==null ? cb.conjunction() : cb.equal(cb.lower(root.get("shop").get("manager").get("email")),managerEmail.toLowerCase(java.util.Locale.ROOT))),
+        return new ManagerReport(start,end,users.count(),scope.visibleShops().size(),products.count((root,query,cb) -> managerEmail==null ? cb.conjunction() : cb.equal(cb.lower(root.get("shop").get("manager").get("email")),managerEmail.toLowerCase(java.util.Locale.ROOT))),
             orders.countPeriod(startAt,endAt,managerEmail),revenue == null ? BigDecimal.ZERO : revenue,status);
     }
     public String csv(ManagerReport report) {
         StringBuilder csv=new StringBuilder("\uFEFFChi tieu,Gia tri\r\n");
         csv.append("Tu ngay,").append(report.from()).append("\r\nDen ngay,").append(report.to());
-        csv.append(scope.managerEmail()==null ? "\r\nNguoi dung," : "\r\nKhach dat hang trong ky,").append(report.users()).append("\r\nShop,").append(report.shops());
+        csv.append("\r\nNguoi dung,").append(report.users()).append("\r\nShop,").append(report.shops());
         csv.append("\r\nSan pham,").append(report.products()).append("\r\nDon hang,").append(report.orders());
         csv.append("\r\nDoanh thu don da giao VND,").append(report.deliveredRevenue().toPlainString()).append("\r\n");
         report.byStatus().forEach((key,value) -> csv.append(key).append(',').append(value).append("\r\n"));

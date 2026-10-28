@@ -10,7 +10,6 @@ import vn.iotstar.starshop.enums.*;
 import vn.iotstar.starshop.repository.*;
 import vn.iotstar.starshop.service.*;
 @SpringBootTest
-@org.springframework.security.test.context.support.WithMockUser(username="admin-test@example.test",roles="ADMIN")
 class ManagerOperationsTests {
     @Autowired ManagerOperationsService service;
     @Autowired ShipperService shipperService;

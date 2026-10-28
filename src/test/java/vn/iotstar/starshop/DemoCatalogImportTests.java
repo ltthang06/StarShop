@@ -12,7 +12,7 @@ import vn.iotstar.starshop.repository.*;
 @SpringBootTest(properties = {
     "spring.profiles.active=demo",
     "starshop.demo-catalog.enabled=true",
-    "spring.datasource.url=jdbc:h2:mem:catalog-import;MODE=MSSQLServer;DB_CLOSE_DELAY=-1",
+    "spring.datasource.url=${starshop.test.database-url:jdbc:h2:mem:catalog-import;MODE=MSSQLServer;DB_CLOSE_DELAY=-1}",
     "BOOTSTRAP_ADMIN_EMAIL=catalog-admin@example.test",
     "BOOTSTRAP_ADMIN_PASSWORD=CatalogTestPassword!",
     "starshop.demo-catalog.owner-email=catalog-admin@example.test"

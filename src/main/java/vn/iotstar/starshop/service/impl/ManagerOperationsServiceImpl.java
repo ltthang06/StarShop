@@ -22,20 +22,43 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
 
     @Override @Transactional(readOnly=true)
     public Page<User> users(String keyword, int page) {
-        scope.requireAdmin();
         String pattern = "%" + (keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT)) + "%";
         Specification<User> spec = (root, query, cb) -> cb.or(
             cb.like(cb.lower(root.get("fullName")), pattern), cb.like(cb.lower(root.get("email")), pattern));
+        String managerEmail = scope.managerEmail();
+        if (managerEmail != null) {
+            spec = spec.and((root, query, cb) -> {
+                var managedShop = query.subquery(Long.class);
+                var shop = managedShop.from(Shop.class);
+                managedShop.select(shop.get("id")).where(
+                    cb.equal(shop.get("owner").get("id"), root.get("id")),
+                    cb.equal(cb.lower(shop.get("manager").get("email")), managerEmail.toLowerCase(Locale.ROOT)));
+                var managedOrder = query.subquery(Long.class);
+                var order = managedOrder.from(Order.class);
+                managedOrder.select(order.get("id")).where(
+                    cb.equal(order.get("user").get("id"), root.get("id")),
+                    cb.equal(cb.lower(order.get("shop").get("manager").get("email")), managerEmail.toLowerCase(Locale.ROOT)));
+                var protectedAccount = query.subquery(Long.class);
+                var protectedUser = protectedAccount.from(User.class);
+                var protectedRole = protectedUser.join("roles");
+                protectedAccount.select(protectedUser.get("id")).where(
+                    cb.equal(protectedUser.get("id"), root.get("id")),
+                    protectedRole.get("name").in(RoleName.ADMIN, RoleName.MANAGER));
+                return cb.and(cb.or(cb.exists(managedShop), cb.exists(managedOrder)), cb.not(cb.exists(protectedAccount)));
+            });
+        }
         return users.findAll(spec, PageRequest.of(Math.max(0,page), 10, Sort.by("id").descending()));
     }
     @Override @Transactional
     public void setUserLocked(Long id, boolean locked, String actorEmail, boolean actorAdmin) {
-        scope.requireAdmin();
         User target = users.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản"));
         if (target.getEmail().equalsIgnoreCase(actorEmail))
             throw new IllegalArgumentException("Không thể khóa hoặc mở khóa tài khoản của chính bạn");
         boolean protectedRole = target.getRoles().stream().anyMatch(r ->
             r.getName() == RoleName.ADMIN || r.getName() == RoleName.MANAGER);
+        String managerEmail = scope.managerEmail();
+        if (managerEmail != null && users.countUserInManagedShops(id, managerEmail) == 0)
+            throw new org.springframework.security.access.AccessDeniedException("Tài khoản không thuộc cửa hàng được phân công");
         if (protectedRole && !actorAdmin)
             throw new IllegalArgumentException("Chỉ Admin được quản lý tài khoản quản trị");
         if (target.getRoles().stream().anyMatch(r -> r.getName() == RoleName.ADMIN))
@@ -49,7 +72,6 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     }
     @Override @Transactional
     public void saveProvider(ShippingProviderForm form) {
-        scope.requireAdmin();
         String name = form.getName().trim();
         boolean duplicate = form.getId() == null ? providers.existsByNameIgnoreCase(name)
             : providers.existsByNameIgnoreCaseAndIdNot(name, form.getId());

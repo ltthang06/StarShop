@@ -7,11 +7,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.AccessDeniedException;
 import vn.iotstar.starshop.entity.Shop;
 import vn.iotstar.starshop.repository.ManagerShopRepository;
+import vn.iotstar.starshop.repository.ManagerUserRepository;
+import vn.iotstar.starshop.entity.User;
 
 
 @Service @RequiredArgsConstructor
 public class ManagerAccessScope {
     private final ManagerShopRepository shops;
+    private final ManagerUserRepository users;
 
     public void requireAdmin() {
         var auth=SecurityContextHolder.getContext().getAuthentication();
@@ -38,5 +41,14 @@ public class ManagerAccessScope {
         String email=managerEmail();
         if (email!=null && (shop.getManager()==null || !email.equalsIgnoreCase(shop.getManager().getEmail())))
             throw new AccessDeniedException("Cửa hàng chưa được phân công cho bạn");
+    }
+
+    public void requireManagedUser(User user) {
+        String email = managerEmail();
+        if (email != null && (user.getRoles().stream().anyMatch(role ->
+                role.getName() == vn.iotstar.starshop.enums.RoleName.ADMIN
+                || role.getName() == vn.iotstar.starshop.enums.RoleName.MANAGER)
+                || users.countUserInManagedShops(user.getId(), email) == 0))
+            throw new AccessDeniedException("Tài khoản không thuộc cửa hàng được phân công");
     }
 }

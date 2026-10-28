@@ -13,7 +13,7 @@ import vn.iotstar.starshop.repository.*;
 @SpringBootTest(properties={"spring.profiles.active=demo","starshop.demo-catalog.enabled=true",
         "starshop.showcase.enabled=true","starshop.showcase.orders-enabled=true","starshop.showcase.password=ShowcaseTestPassword!",
         "BOOTSTRAP_ADMIN_EMAIL=admin@starshop.local","BOOTSTRAP_ADMIN_PASSWORD=ShowcaseAdminPassword!",
-        "spring.datasource.url=jdbc:h2:mem:showcase;MODE=MSSQLServer;DB_CLOSE_DELAY=-1"})
+        "spring.datasource.url=${starshop.test.database-url:jdbc:h2:mem:showcase;MODE=MSSQLServer;DB_CLOSE_DELAY=-1}"})
 class ShowcaseSetupTests {
     @Autowired ShowcaseSetup setup;
     @Autowired ShowcaseOrderSetup workflow;

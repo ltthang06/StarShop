@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="shop" tagdir="/WEB-INF/tags" %>
-<c:set var="managementAdmin" value="${pageContext.request.isUserInRole('ADMIN')}"/>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -15,18 +14,16 @@
 <body class="bg-light">
 <nav class="navbar navbar-dark manager-navbar py-3" aria-label="Điều hướng quản trị">
     <div class="container gap-2">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}/manager"><span class="manager-brand-mark" aria-hidden="true">S</span>${managementAdmin ? 'StarShop Admin' : 'StarShop Manager'}</a>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/manager"><span class="manager-brand-mark" aria-hidden="true">S</span>StarShop ${pageContext.request.isUserInRole('ADMIN') ? 'Admin' : 'Manager'}</a>
         <button class="btn btn-outline-light manager-menu-toggle" id="manager-menu-toggle" type="button"
                 aria-expanded="false" aria-controls="manager-menu">Menu</button>
         <div class="manager-menu" id="manager-menu">
-            <c:if test="${managementAdmin}"><a class="nav-link" href="${pageContext.request.contextPath}/manager/users">Người dùng</a></c:if>
+            <a class="nav-link" href="${pageContext.request.contextPath}/manager/users">Người dùng</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/shops">Cửa hàng</a>
-            <c:if test="${managementAdmin}"><a class="nav-link" href="${pageContext.request.contextPath}/manager/categories">Danh mục</a></c:if>
+            <a class="nav-link" href="${pageContext.request.contextPath}/manager/categories">Danh mục</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/products">Sản phẩm</a>
-            <c:if test="${managementAdmin}">
-            <a class="nav-link" href="${pageContext.request.contextPath}/manager/promotions">Voucher hệ thống</a>
+            <a class="nav-link" href="${pageContext.request.contextPath}/manager/promotions">Voucher</a>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/shipping-providers">Vận chuyển</a>
-            </c:if>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/orders">Đơn hàng</a>
             <c:if test="${pageContext.request.isUserInRole('ADMIN')}"><a class="nav-link" href="${pageContext.request.contextPath}/manager/payments">Đối soát thanh toán</a></c:if>
             <a class="nav-link" href="${pageContext.request.contextPath}/manager/reports">Báo cáo</a>

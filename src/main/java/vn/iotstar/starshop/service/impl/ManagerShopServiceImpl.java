@@ -64,7 +64,6 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional
     public void approve(Long id) {
-        scope.requireAdmin();
         Shop shop = lockedShop(id);
         if (shop.getStatus() != ShopStatus.PENDING) {
             throw new IllegalArgumentException("Chỉ có thể duyệt cửa hàng đang chờ");
@@ -86,7 +85,6 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional
     public void reject(Long id) {
-        scope.requireAdmin();
         Shop shop = lockedShop(id);
         if (shop.getStatus() != ShopStatus.PENDING) {
             throw new IllegalArgumentException("Chỉ có thể từ chối cửa hàng đang chờ");
@@ -98,7 +96,6 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional
     public void block(Long id) {
-        scope.requireAdmin();
         Shop shop = lockedShop(id);
         if (shop.getStatus() != ShopStatus.ACTIVE) {
             throw new IllegalArgumentException("Chỉ có thể khóa cửa hàng đang hoạt động");
@@ -110,7 +107,6 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional
     public void reopen(Long id) {
-        scope.requireAdmin();
         Shop shop = lockedShop(id);
         if (shop.getStatus() != ShopStatus.BLOCKED) {
             throw new IllegalArgumentException("Chỉ có thể mở lại cửa hàng đã khóa");
@@ -129,7 +125,6 @@ public class ManagerShopServiceImpl implements ManagerShopService {
     @Override
     @Transactional
     public void setCommission(Long shopId, BigDecimal ratePercent) {
-        scope.requireAdmin();
         if (ratePercent == null || ratePercent.scale() > 2
                 || ratePercent.compareTo(BigDecimal.ZERO) < 0
                 || ratePercent.compareTo(new BigDecimal("100.00")) > 0) {

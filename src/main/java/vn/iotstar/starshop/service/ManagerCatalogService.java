@@ -64,7 +64,6 @@ public class ManagerCatalogService {
 
     @Transactional(readOnly=true)
     public Page<Promotion> promotions(String keyword, int page) {
-        scope.requireAdmin();
         String pattern = "%" + (keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT)) + "%";
         Specification<Promotion> spec = (root, query, cb) -> cb.and(
             cb.equal(root.get("scope"), PromotionScope.SYSTEM),
@@ -74,14 +73,12 @@ public class ManagerCatalogService {
 
     @Transactional(readOnly=true)
     public Promotion systemPromotion(Long id) {
-        scope.requireAdmin();
         Promotion p = promotions.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher"));
         requireSystem(p); return p;
     }
 
     @Transactional
     public Promotion savePromotion(Long id, PromotionRequest form) {
-        scope.requireAdmin();
         if (form.getCode() == null || !form.getCode().trim().matches("[A-Za-z0-9_-]{3,50}"))
             throw new IllegalArgumentException("Mã gồm 3–50 chữ, số, dấu gạch ngang hoặc gạch dưới");
         if (form.getName() == null || form.getName().isBlank() || form.getName().length() > 150
@@ -112,7 +109,6 @@ public class ManagerCatalogService {
 
     @Transactional
     public void togglePromotion(Long id, boolean active) {
-        scope.requireAdmin();
         Promotion p = promotions.findLocked(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher"));
         requireSystem(p); p.setActive(active);
     }

@@ -12,10 +12,12 @@ import vn.iotstar.starshop.enums.RoleName;
 public class AdminUserController {
     private final ManagerUserRepository users;
     private final AdminUserService service;
+    private final vn.iotstar.starshop.service.ManagerAccessScope scope;
     @GetMapping("/manager/users/{id}")
     public String detail(@PathVariable Long id,Model model,RedirectAttributes redirect) {
         var user=users.findById(id);
         if(user.isEmpty()) {redirect.addFlashAttribute("error","Không tìm thấy tài khoản");return "redirect:/manager/users";}
+        scope.requireManagedUser(user.get());
         model.addAttribute("account",user.get());return "manager/user-detail";
     }
     @PostMapping("/manager/users/{id}/roles")

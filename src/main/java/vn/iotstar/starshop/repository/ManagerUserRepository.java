@@ -5,6 +5,9 @@ import org.springframework.data.repository.query.Param;
 import vn.iotstar.starshop.entity.User;
 import vn.iotstar.starshop.enums.*;
 public interface ManagerUserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    @Query("select count(u) from User u where u.id = :userId and (u.id in (select s.owner.id from Shop s where lower(s.manager.email) = lower(:managerEmail)) or u.id in (select o.user.id from Order o where lower(o.shop.manager.email) = lower(:managerEmail)))")
+    long countUserInManagedShops(@Param("userId") Long userId, @Param("managerEmail") String managerEmail);
+
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths="roles")
     java.util.Optional<User> findById(Long id);
 
