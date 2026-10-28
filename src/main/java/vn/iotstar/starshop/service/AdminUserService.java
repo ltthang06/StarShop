@@ -8,9 +8,11 @@ import vn.iotstar.starshop.repository.*;
 @Service @RequiredArgsConstructor
 public class AdminUserService {
     private final ManagerUserRepository users;
+    private final ManagerAccessScope scope;
     private final RoleRepository roles;
     @Transactional
     public void setOperationalRole(Long id,RoleName role,boolean enabled,String actor) {
+        scope.requireAdmin();
         if(role!=RoleName.SHIPPER && role!=RoleName.MANAGER)
             throw new IllegalArgumentException("Chỉ cấp/gỡ vai trò MANAGER hoặc SHIPPER; VENDOR được cấp qua duyệt shop");
         var user=users.findLocked(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản"));

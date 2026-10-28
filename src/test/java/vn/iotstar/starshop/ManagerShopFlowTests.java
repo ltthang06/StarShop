@@ -23,6 +23,7 @@ import vn.iotstar.starshop.repository.SecurityUserRepository;
 import vn.iotstar.starshop.service.ManagerShopService;
 
 @SpringBootTest
+@org.springframework.security.test.context.support.WithMockUser(username="admin-test@example.test",roles="ADMIN")
 class ManagerShopFlowTests {
 
     @Autowired private ManagerShopService managerShopService;

@@ -13,6 +13,13 @@ import vn.iotstar.starshop.repository.ManagerShopRepository;
 public class ManagerAccessScope {
     private final ManagerShopRepository shops;
 
+    public void requireAdmin() {
+        var auth=SecurityContextHolder.getContext().getAuthentication();
+        if(auth==null || !auth.isAuthenticated() || auth.getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN")))
+            throw new AccessDeniedException("Chỉ Admin được thay đổi chính sách toàn hệ thống");
+    }
+
     public String managerEmail() {
         var auth=SecurityContextHolder.getContext().getAuthentication();
         if (auth==null) return null;

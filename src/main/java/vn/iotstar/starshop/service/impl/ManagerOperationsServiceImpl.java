@@ -22,6 +22,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
 
     @Override @Transactional(readOnly=true)
     public Page<User> users(String keyword, int page) {
+        scope.requireAdmin();
         String pattern = "%" + (keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT)) + "%";
         Specification<User> spec = (root, query, cb) -> cb.or(
             cb.like(cb.lower(root.get("fullName")), pattern), cb.like(cb.lower(root.get("email")), pattern));
@@ -29,6 +30,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     }
     @Override @Transactional
     public void setUserLocked(Long id, boolean locked, String actorEmail, boolean actorAdmin) {
+        scope.requireAdmin();
         User target = users.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản"));
         if (target.getEmail().equalsIgnoreCase(actorEmail))
             throw new IllegalArgumentException("Không thể khóa hoặc mở khóa tài khoản của chính bạn");
@@ -47,6 +49,7 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
     }
     @Override @Transactional
     public void saveProvider(ShippingProviderForm form) {
+        scope.requireAdmin();
         String name = form.getName().trim();
         boolean duplicate = form.getId() == null ? providers.existsByNameIgnoreCase(name)
             : providers.existsByNameIgnoreCaseAndIdNot(name, form.getId());

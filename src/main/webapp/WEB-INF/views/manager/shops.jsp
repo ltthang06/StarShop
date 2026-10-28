@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ include file="fragments/header.jsp" %>
 
-    <h1 class="h3 mb-3">Quản lý cửa hàng</h1>
+    <h1 class="h3 mb-3">${managementAdmin ? 'Quản lý cửa hàng' : 'Cửa hàng được phân công'}</h1>
     <form class="row g-2 mb-3" method="get" action="${pageContext.request.contextPath}/manager/shops">
         <div class="col-md-5"><input class="form-control" name="keyword" value="<c:out value='${keyword}'/>" placeholder="Tên cửa hàng hoặc email chủ shop"></div>
         <div class="col-md-3"><select class="form-select" name="status"><option value="">Mọi trạng thái</option><c:forEach items="${statuses}" var="item"><option value="${item}" ${selectedStatus == item ? 'selected' : ''}>${viewFormat.label(item)}</option></c:forEach></select></div>

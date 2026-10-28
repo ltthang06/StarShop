@@ -80,8 +80,13 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/products/**", "GET")
                 ).permitAll()
                 .requestMatchers(paths("/manager/payments", "/manager/payments/**")).hasRole("ADMIN")
-                .requestMatchers(paths("/manager/users/*/roles")).hasRole("ADMIN")
-                .requestMatchers(paths("/manager/shops/*/manager")).hasRole("ADMIN")
+                .requestMatchers(paths("/manager/users", "/manager/users/**",
+                        "/manager/categories", "/manager/categories/**",
+                        "/manager/promotions", "/manager/promotions/**",
+                        "/manager/shipping-providers", "/manager/shipping-providers/**")).hasRole("ADMIN")
+                .requestMatchers(paths("/manager/shops/*/manager", "/manager/shops/*/commission",
+                        "/manager/shops/*/approve", "/manager/shops/*/reject",
+                        "/manager/shops/*/block", "/manager/shops/*/reopen")).hasRole("ADMIN")
                 .requestMatchers(paths("/manager", "/manager/**"))
                 .hasAnyRole("MANAGER", "ADMIN")
                 .requestMatchers(paths("/admin/**"))

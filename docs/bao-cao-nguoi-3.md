@@ -1,6 +1,6 @@
 # Báo cáo Người 3 — Quản trị và tích hợp StarShop
 
-Ngày cập nhật: 26/10/2026. Nhánh: `feature/manager-admin`.
+Ngày cập nhật: 28/10/2026. Nhánh: `feature/manager-admin`.
 
 ## 1. Phạm vi và hiện trạng
 
@@ -22,19 +22,19 @@ Bảng mới `product_moderations` lưu ID sản phẩm, cờ khóa, lý do, ng�
 | Chức năng | Đường dẫn | Quy tắc chính |
 |---|---|---|
 | Dashboard | /manager | Tổng User/Shop/Product/Category; đơn và doanh thu tháng hiện tại |
-| User | /manager/users | Tìm tên/email, phân trang, xem chi tiết, khóa/mở khóa |
+| User | /manager/users | Chỉ Admin tìm tên/email, phân trang, xem chi tiết, khóa/mở khóa |
 | Cấp vai trò | /manager/users/{id}/roles | Chỉ Admin cấp/gỡ Manager/Shipper; Vendor qua duyệt shop |
-| Shop | /manager/shops | Duyệt/từ chối/khóa/mở; xem chi tiết |
-| Danh mục | /manager/categories | Thêm/sửa/bật/tắt, kiểm tra dữ liệu |
+| Shop | /manager/shops | Admin duyệt/từ chối/khóa/mở; Manager xem shop được phân công |
+| Danh mục | /manager/categories | Chỉ Admin thêm/sửa/bật/tắt |
 | Kiểm duyệt | /manager/products | Tìm tên, lọc shop/trạng thái; khóa có lý do 10–500 ký tự |
-| Commission | /manager/shops/{id}/commission | 0–100%, 2 chữ số thập phân; lưu lịch sử |
-| Voucher SYSTEM | /manager/promotions | Tạo/sửa/bật/tắt; %, số tiền, miễn vận chuyển |
-| Nhà vận chuyển | /manager/shipping-providers | Phí không âm, thời gian 1–365 ngày, bật/tắt |
+| Commission | /manager/shops/{id}/commission | Chỉ Admin sửa tỷ lệ 0–100%, lưu lịch sử; Manager chỉ xem tỷ lệ của shop được giao |
+| Voucher SYSTEM | /manager/promotions | Chỉ Admin tạo/sửa/bật/tắt; %, số tiền, miễn vận chuyển |
+| Nhà vận chuyển | /manager/shipping-providers | Chỉ Admin sửa danh sách và biểu phí chung; Manager chọn nhà vận chuyển có sẵn khi phân công đơn |
 | Đơn/phân công | /manager/orders | Phân trang/lọc; chỉ phân công READY_FOR_PICKUP chưa có Shipper |
 | Báo cáo | /manager/reports | Khoảng ngày, trạng thái, doanh thu, CSV |
 | Thông báo | /notifications | Chỉ xem/đánh dấu thông báo của chính mình |
 
-Không tự khóa tài khoản; không mở khóa INACTIVE thành ACTIVE; Manager không quản lý tài khoản Manager/Admin; chức năng khóa không khóa Admin.
+Chỉ Admin quản lý tài khoản; không tự khóa tài khoản, không mở khóa INACTIVE thành ACTIVE; chức năng khóa không khóa Admin.
 Admin quản lý toàn hệ thống và cấp vai trò vận hành. Manager chỉ quản lý các shop được Admin phân công; service giới hạn cả truy cập trực tiếp qua ID.
 
 Sản phẩm bị kiểm duyệt chuyển INACTIVE. Vendor không thể sửa/bật lại khi cờ kiểm duyệt còn khóa. Mở kiểm duyệt vẫn giữ INACTIVE để Vendor tự kiểm tra và bật sản phẩm.
@@ -144,3 +144,14 @@ Các nhận định “chưa chạy toàn ứng dụng qua SQL Server” ở ph�
 - SMTP: xác thực và gửi email thành công tới chủ tài khoản. Luồng nhận và nhập OTP đăng ký/quên mật khẩu thật cần chủ email nghiệm thu.
 - `mvn verify`: 69 kiểm thử, 0 thất bại, 0 lỗi. Đã đóng gói WAR và mở lại ứng dụng SQL Server.
 - Báo cáo các thành viên cần bổ sung họ tên, MSSV và ảnh minh chứng cá nhân trước khi nộp.
+
+
+## 12. Phân quyền quản lý chi nhánh ngày 28/10/2026
+
+Quy ước vận hành: Manager là quản lý chi nhánh, Admin là quản trị toàn hệ thống. Quyền thiết lập chính sách chung được tách khỏi Manager để phù hợp phạm vi shop được giao. Khi đối chiếu đề có mô tả quyền Manager và Admin gần nhau, nhóm cần nêu rõ quy ước này.
+
+Manager quản lý sản phẩm, xem đơn và phân công giao hàng, xem báo cáo và tỷ lệ chiết khấu trong các shop được phân công. Manager không đổi chiết khấu app, duyệt/khóa shop, quản lý tài khoản, danh mục chung, voucher hệ thống hoặc biểu phí vận chuyển. Voucher SHOP vẫn do Vendor phụ trách.
+
+Menu và biểu mẫu được tách theo vai trò; URL và service cùng kiểm tra quyền. Báo cáo Manager chỉ đếm khách đã đặt hàng tại shop được giao trong khoảng ngày chọn, không dùng tổng tài khoản toàn hệ thống.
+
+Manager không được mở danh sách tài khoản hoặc hồ sơ Manager khác, kể cả truy cập trực tiếp bằng ID hoặc tìm email. Chỉ Admin xem và quản lý hồ sơ nhân sự toàn hệ thống. Manager vẫn truy cập trang cá nhân của chính mình và thông tin cần thiết để xử lý đơn thuộc shop được giao.
