@@ -107,6 +107,27 @@ class GuestPageTests {
     private CustomerPromotionRepository promotionRepository;
 
     @Test
+    void failedLoginDisplaysErrorAfterRedirectWithEmptyErrorParameter() throws Exception {
+        var client=HttpClient.newBuilder()
+                .cookieHandler(new CookieManager(null,CookiePolicy.ACCEPT_ALL))
+                .followRedirects(HttpClient.Redirect.NORMAL).build();
+        String root="http://localhost:"+port;
+        var login=client.send(HttpRequest.newBuilder(URI.create(root+"/login")).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertThat(login.body()).doesNotContain("Đăng nhập thất bại.");
+        var csrf=Pattern.compile("name=\"_csrf\"[^>]*value=\"([^\"]+)\"").matcher(login.body());
+        assertThat(csrf.find()).isTrue();
+        String body="email=missing-login-account%40example.test&password=wrong-password&_csrf="
+                +java.net.URLEncoder.encode(csrf.group(1),java.nio.charset.StandardCharsets.UTF_8);
+        var failed=client.send(HttpRequest.newBuilder(URI.create(root+"/login"))
+                .header("Content-Type","application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(body)).build(),HttpResponse.BodyHandlers.ofString());
+        assertThat(failed.statusCode()).isEqualTo(200);
+        assertThat(failed.uri().getQuery()).isEqualTo("error");
+        assertThat(failed.body()).contains("role=\"alert\"","Đăng nhập thất bại.","Email hoặc mật khẩu không đúng");
+    }
+
+    @Test
     void publicPagesRender() throws Exception {
         assertThat(servletContext.getResource(
                 "/WEB-INF/views/guest/home.jsp")).isNotNull();

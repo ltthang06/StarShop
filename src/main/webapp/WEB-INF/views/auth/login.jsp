@@ -10,8 +10,8 @@
     <div class="col-md-5 mx-auto">
         <h1 class="h3 mb-4">Đăng nhập</h1>
 
-        <c:if test="${not empty param.error}">
-            <div class="alert alert-danger">Email hoặc mật khẩu không đúng, hoặc tài khoản chưa hoạt động.</div>
+        <c:if test="${param.error ne null}">
+            <div class="alert alert-danger" role="alert">Đăng nhập thất bại. Email hoặc mật khẩu không đúng, hoặc tài khoản chưa hoạt động.</div>
         </c:if>
         <c:if test="${not empty successMessage}">
             <div class="alert alert-success"><c:out value="${successMessage}"/></div>
