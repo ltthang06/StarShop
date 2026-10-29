@@ -67,6 +67,10 @@ public class VnpayPaymentService {
     }
     @Transactional
     public String redirectUrl(String reference,String email) {
+        return redirectUrl(reference,email,"http://127.0.0.1:8080/payments/vnpay/return");
+    }
+    @Transactional
+    public String redirectUrl(String reference,String email,String browserReturnUrl) {
         config.requireReady();owned(reference,email);
         var p=payments.findForUpdate(reference).orElseThrow();
         if(p.getState()!=VnpayPayment.State.PENDING || p.getReturnReceivedAt()!=null
@@ -78,7 +82,7 @@ public class VnpayPaymentService {
         fields.put("vnp_Version","2.1.0");fields.put("vnp_Command","pay");fields.put("vnp_TmnCode",config.getTmnCode());
         fields.put("vnp_Amount",p.getAmount().movePointRight(2).toBigIntegerExact().toString());fields.put("vnp_CurrCode","VND");
         fields.put("vnp_TxnRef",p.getReference());fields.put("vnp_OrderInfo","Thanh toan hoa StarShop "+p.getReference());
-        fields.put("vnp_OrderType","other");fields.put("vnp_Locale","vn");fields.put("vnp_ReturnUrl",config.getReturnUrl());
+        fields.put("vnp_OrderType","other");fields.put("vnp_Locale","vn");fields.put("vnp_ReturnUrl",config.resolveReturnUrl(browserReturnUrl));
         fields.put("vnp_IpAddr",p.getClientIp());fields.put("vnp_CreateDate",p.getCreatedAt().format(TIME));fields.put("vnp_ExpireDate",p.getExpiresAt().format(TIME));
         return config.getPaymentUrl()+"?"+signer.query(fields)+"&vnp_SecureHash="+signer.signature(fields);
     }

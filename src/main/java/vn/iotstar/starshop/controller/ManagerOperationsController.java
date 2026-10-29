@@ -48,6 +48,15 @@ public class ManagerOperationsController {
         }
         prepareProviders(model,form); return "manager/shipping-providers";
     }
+    @PostMapping("/shipping-providers/{id}/active")
+    public String setProviderActive(@PathVariable Long id, @RequestParam boolean active,
+            RedirectAttributes redirect) {
+        return action(() -> {
+            service.setProviderActive(id, active);
+            return active ? "Đã bật đơn vị vận chuyển" : "Đã tắt đơn vị vận chuyển";
+        }, "/manager/shipping-providers", redirect);
+    }
+
     private void prepareProviders(Model model, ShippingProviderForm form) {
         model.addAttribute("providerForm",form); model.addAttribute("providers",providers.findAllByOrderByNameAsc());
     }

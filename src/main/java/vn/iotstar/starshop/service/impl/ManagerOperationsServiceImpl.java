@@ -82,6 +82,14 @@ public class ManagerOperationsServiceImpl implements ManagerOperationsService {
         provider.setEstimatedDays(form.getEstimatedDays()); provider.setActive(form.isActive());
         providers.save(provider);
     }
+    @Override @Transactional
+    public void setProviderActive(Long id, boolean active) {
+        ShippingProvider provider = providers.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn vị vận chuyển"));
+        provider.setActive(active);
+        providers.save(provider);
+    }
+
     @Override @Transactional(readOnly=true)
     public Page<Order> orders(OrderStatus status, int page) {
         Specification<Order> spec = (root, query, cb) -> status == null ? cb.conjunction() : cb.equal(root.get("status"),status);

@@ -41,7 +41,7 @@ class ManagerCompletionTests {
 
     @Test void customerVendorManagerShipperCustomerAndRefund() throws Exception {
         User customer=account(RoleName.USER),vendor=account(RoleName.USER),shipper=account(RoleName.SHIPPER);
-        Shop shop=new Shop();shop.setName("Flow "+UUID.randomUUID());shop.setOwner(vendor);shop=shops.save(shop);
+        Shop shop=new Shop();shop.setName("Flow "+UUID.randomUUID());shop.setOwner(vendor);shop.setManager(account(RoleName.MANAGER));shop=shops.save(shop);
         management.approve(shop.getId()); management.setCommission(shop.getId(),new BigDecimal("5.00"));
         Category category=new Category();category.setName("Flowers "+UUID.randomUUID());category=categories.save(category);
         ProductRequest request=productForm(category.getId());

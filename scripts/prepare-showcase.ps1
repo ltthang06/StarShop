@@ -21,10 +21,12 @@ Mật khẩu cho các tài khoản dưới đây: $accountPassword
 | Vai trò | Email |
 |---|---|
 | User | customer@starshop.local |
-| Vendor Thủ Đức | vendor.thuduc@starshop.local |
-| Vendor Bình Thạnh | vendor.binhthanh@starshop.local |
-| Manager Thủ Đức và Central | manager.thuduc@starshop.local |
-| Manager Bình Thạnh | manager.binhthanh@starshop.local |
+| Vendor Võ Văn Ngân | vendor.vovanngan@starshop.local |
+| Vendor Lê Văn Việt | vendor.leuvanviet@starshop.local |
+| Vendor Nguyễn Gia Trí | vendor.nguyengiati@starshop.local |
+| Vendor Xô Viết Nghệ Tĩnh | vendor.xovietnghetinh@starshop.local |
+| Manager 1 | manager1@starshop.local |
+| Manager 2 | manager2@starshop.local |
 | Shipper | shipper@starshop.local |
 
 Admin: admin@starshop.local, xem mật khẩu trong application-local.properties.

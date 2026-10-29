@@ -27,6 +27,17 @@ class ReviewConcurrencyTests {
 
     private static final String TEXT="Hoa tươi, đóng gói cẩn thận, giao đúng hẹn và nhân viên hỗ trợ nhiệt tình.";
 
+    @Test void reviewButtonRequiresDeliveredPurchaseAndDisappearsAfterSubmitting() throws Exception {
+        var f=fixture();
+        assertTrue(service.availableTarget(f.user().getEmail(),f.product().getId()).isPresent());
+        assertTrue(service.availableTarget(user().getEmail(),f.product().getId()).isEmpty());
+        var order=f.line().getOrder();order.setStatus(OrderStatus.NEW);orders.save(order);
+        assertTrue(service.availableTarget(f.user().getEmail(),f.product().getId()).isEmpty());
+        order.setStatus(OrderStatus.DELIVERED);orders.save(order);
+        service.submit(f.user().getEmail(),order.getId(),f.line().getId(),5,TEXT,null,null);
+        assertTrue(service.availableTarget(f.user().getEmail(),f.product().getId()).isEmpty());
+    }
+
     @Test void twoBuyersReviewOneProductWithoutLosingAverageOrInventory() throws Exception {
         var first=fixture();
         var buyer=user();

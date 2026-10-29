@@ -64,6 +64,8 @@ public class CustomerProductController {
         if (authentication != null
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
             activityService.recordView(authentication.getName(), id);
+            reviewService.availableTarget(authentication.getName(),id)
+                    .ifPresent(target -> model.addAttribute("reviewTarget",target));
         }
         return "guest/product-detail";
     }

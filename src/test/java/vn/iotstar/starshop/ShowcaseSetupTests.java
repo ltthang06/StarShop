@@ -28,7 +28,7 @@ class ShowcaseSetupTests {
     @Autowired ShipperAssignmentRepository assignments;
 
     @Test void fillsAllRolesAndOrderStagesThroughServicesAndCanRunAgain() throws Exception {
-        assertEquals(50,products.count());assertEquals(3,shops.count());assertEquals(7,users.count());
+        assertEquals(52,products.count());assertEquals(5,shops.count());assertEquals(9,users.count());
         assertEquals(2,providers.count());assertEquals(3,promotions.count());assertEquals(13,orders.count());assertEquals(1,reviews.count());
         var expected=EnumSet.of(OrderStatus.NEW,OrderStatus.CONFIRMED,OrderStatus.READY_FOR_PICKUP,OrderStatus.ASSIGNED,OrderStatus.PICKED_UP,
                 OrderStatus.SHIPPING,OrderStatus.DELIVERED,OrderStatus.CANCELLED,OrderStatus.RETURN_REQUESTED,OrderStatus.RETURNED,OrderStatus.REFUNDED);
@@ -37,6 +37,6 @@ class ShowcaseSetupTests {
         for(var p:products.findAll()) assertTrue(p.getQuantity()>=0);
         assertEquals(0,importer.importCatalog("admin@starshop.local"));
         setup.run(new DefaultApplicationArguments());workflow.run(new DefaultApplicationArguments());
-        assertEquals(50,products.count());assertEquals(3,shops.count());assertEquals(7,users.count());assertEquals(13,orders.count());assertEquals(1,reviews.count());
+        assertEquals(52,products.count());assertEquals(5,shops.count());assertEquals(9,users.count());assertEquals(13,orders.count());assertEquals(1,reviews.count());
     }
 }

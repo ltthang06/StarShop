@@ -30,7 +30,7 @@ VNPAY không thể gọi `127.0.0.1` hoặc `localhost` của máy cá nhân. Đ
 
 1. Chuẩn bị địa chỉ HTTPS cho ứng dụng hoặc relay HTTPS chỉ chuyển tiếp IPN tới endpoint local.
 2. Cấu hình URL IPN công khai trong merchant theo hướng dẫn VNPAY; không gửi HashSecret vào URL.
-3. Nếu trình duyệt dùng domain mới, sửa `return-url` tương ứng và khởi động lại.
+3. Để trống `return-url` để app tự lấy tên miền và HTTPS từ trình duyệt hiện tại. `server.forward-headers-strategy=framework` giúp giữ HTTPS khi chạy qua proxy. Có thể đặt `VNPAY_RETURN_URL` nếu cần địa chỉ cố định.
 4. Dùng thẻ thử nghiệm do VNPAY cung cấp; xác nhận giao dịch trên gateway, kiểm tra IPN cập nhật database. Không dùng thẻ thật trong môi trường này.
 
 Máy local có thể dùng relay chỉ mở IPN qua Cloudflare Tunnel khi được yêu cầu; các trang đăng nhập/quản trị không cần công khai. Khi chưa có IPN công khai, kiểm thử chữ ký/callback chạy được tại máy nhưng chưa chứng minh VNPAY đã gọi IPN thật. Không giả lập cập nhật PAID từ Return URL để thay bước này.

@@ -64,7 +64,9 @@ public class VnpayController {
 
     @GetMapping("/{reference}/redirect")
     public String redirect(@PathVariable String reference,Authentication auth,RedirectAttributes flash) {
-        try {return "redirect:"+payments.redirectUrl(reference,auth.getName());}
+        String returnUrl=org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/payments/vnpay/return").build().toUriString();
+        try {return "redirect:"+payments.redirectUrl(reference,auth.getName(),returnUrl);}
         catch(IllegalArgumentException ex) {flash.addFlashAttribute("errorMessage",ex.getMessage());return "redirect:/orders";}
     }
 

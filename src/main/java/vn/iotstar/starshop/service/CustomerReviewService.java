@@ -52,6 +52,12 @@ public class CustomerReviewService {
     }
 
     @Transactional(readOnly = true)
+    public java.util.Optional<CustomerReviewTarget> availableTarget(String email,Long productId) {
+        return detailRepository.findReviewable(productId,email,PageRequest.of(0,1)).stream().findFirst()
+                .map(detail -> new CustomerReviewTarget(detail.getOrder().getId(),detail.getId(),detail.getProduct().getName()));
+    }
+
+    @Transactional(readOnly = true)
     public CustomerReviewTarget target(
             String email, Long orderId, Long detailId) {
 

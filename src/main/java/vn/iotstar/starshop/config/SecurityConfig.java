@@ -70,6 +70,7 @@ public class SecurityConfig {
                         "/favicon.ico",
                         "/css/**",
                         "/assets/**",
+                        "/data/**",
                         "/js/**",
                         "/images/**",
                         "/uploads/**",
@@ -102,6 +103,12 @@ public class SecurityConfig {
                 .permitAll()
         );
 
+        http.exceptionHandling(errors -> errors.accessDeniedHandler((request,response,exception) -> {
+            if(exception instanceof org.springframework.security.web.csrf.CsrfException
+                    && request.getRequestURI().equals(request.getContextPath()+"/login"))
+                response.sendRedirect(request.getContextPath()+"/login?expired");
+            else response.sendError(jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN,"Bạn không có quyền truy cập chức năng này");
+        }));
         http.addFilterAfter(new ActiveAccountFilter(users),
                 org.springframework.security.web.authentication.AnonymousAuthenticationFilter.class);
         return http.build();

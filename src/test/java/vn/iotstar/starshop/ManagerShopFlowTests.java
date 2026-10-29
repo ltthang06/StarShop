@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import vn.iotstar.starshop.entity.Shop;
+import vn.iotstar.starshop.entity.Role;
 import vn.iotstar.starshop.entity.User;
 import vn.iotstar.starshop.enums.RoleName;
 import vn.iotstar.starshop.enums.ShopStatus;
@@ -20,6 +21,7 @@ import vn.iotstar.starshop.enums.UserStatus;
 import vn.iotstar.starshop.repository.CommissionRepository;
 import vn.iotstar.starshop.repository.ManagerShopRepository;
 import vn.iotstar.starshop.repository.SecurityUserRepository;
+import vn.iotstar.starshop.repository.RoleRepository;
 import vn.iotstar.starshop.service.ManagerShopService;
 
 @SpringBootTest
@@ -28,6 +30,7 @@ class ManagerShopFlowTests {
     @Autowired private ManagerShopService managerShopService;
     @Autowired private ManagerShopRepository shopRepository;
     @Autowired private SecurityUserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
     @Autowired private CommissionRepository commissionRepository;
 
     @Test
@@ -76,9 +79,23 @@ class ManagerShopFlowTests {
         owner.setStatus(UserStatus.ACTIVE);
         owner = userRepository.save(owner);
 
+        Role managerRole = roleRepository.findByName(RoleName.MANAGER).orElseGet(() -> {
+            Role role = new Role();
+            role.setName(RoleName.MANAGER);
+            return roleRepository.save(role);
+        });
+        User manager = new User();
+        manager.setFullName("Manager Test");
+        manager.setEmail(UUID.randomUUID() + "@example.test");
+        manager.setPassword("unused-test-password");
+        manager.setStatus(UserStatus.ACTIVE);
+        manager.getRoles().add(managerRole);
+        manager = userRepository.save(manager);
+
         Shop shop = new Shop();
         shop.setName("Shop Test");
         shop.setOwner(owner);
+        shop.setManager(manager);
         return shopRepository.save(shop);
     }
 }

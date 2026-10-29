@@ -300,17 +300,24 @@
                             <form method="post"
                                   class="d-inline"
                                   action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/products/${product.id}/delete"
-                                  onsubmit="return confirm('Chuyển sản phẩm sang INACTIVE?')">
+                                  onsubmit="return confirm('Ngừng bán sản phẩm này?')">
 
                                 <input type="hidden"
                                        name="${_csrf.parameterName}"
                                        value="${_csrf.token}">
 
                                 <button type="submit"
-                                        class="btn btn-sm btn-outline-danger">
+                                        class="btn btn-sm btn-outline-warning">
                                     Ngừng bán
                                 </button>
 
+                            </form>
+
+                            <form method="post" class="d-inline"
+                                  action="${pageContext.request.contextPath}/vendor/shops/${shop.id}/products/${product.id}/remove"
+                                  onsubmit="return confirm('Xóa sản phẩm này? Chỉ xóa được sản phẩm chưa phát sinh đơn hàng hoặc lượt bán. Sản phẩm sẽ được gỡ khỏi giỏ hàng và mục yêu thích.')">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
                             </form>
 
                         </td>

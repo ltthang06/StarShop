@@ -26,7 +26,7 @@ public interface CustomerCatalogRepository extends JpaRepository<Product, Long> 
     List<Product> findChatCatalog(Pageable pageable);
 
 
-    @EntityGraph(attributePaths = "category")
+    @EntityGraph(attributePaths = {"category", "shop"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.id IN :ids AND p.status = :productStatus
@@ -55,7 +55,7 @@ public interface CustomerCatalogRepository extends JpaRepository<Product, Long> 
             @Param("shopStatus") ShopStatus shopStatus,
             Pageable pageable);
 
-    @EntityGraph(attributePaths = "category")
+    @EntityGraph(attributePaths = {"category", "shop"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.status = :productStatus
@@ -70,7 +70,7 @@ public interface CustomerCatalogRepository extends JpaRepository<Product, Long> 
             @Param("shopStatus") ShopStatus shopStatus,
             Pageable pageable);
 
-    @EntityGraph(attributePaths = "category")
+    @EntityGraph(attributePaths = {"category", "shop"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.status = :productStatus

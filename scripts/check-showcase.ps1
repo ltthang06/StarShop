@@ -6,10 +6,12 @@ if(!$passwordLine) { throw 'Showcase account configuration missing.' }
 $accountPassword=$passwordLine.Substring('starshop.showcase.password='.Length)
 $routes=@{
     'customer@starshop.local'=@('/profile','/orders','/cart','/wishlist','/recently-viewed')
-    'vendor.thuduc@starshop.local'=@('/vendor/dashboard','/vendor/shops','/orders')
-    'vendor.binhthanh@starshop.local'=@('/vendor/dashboard','/vendor/shops')
-    'manager.thuduc@starshop.local'=@('/manager','/manager/shops','/manager/products','/manager/orders','/manager/reports')
-    'manager.binhthanh@starshop.local'=@('/manager','/manager/shops','/manager/orders')
+    'vendor.vovanngan@starshop.local'=@('/vendor/dashboard','/vendor/shops','/orders')
+    'vendor.leuvanviet@starshop.local'=@('/vendor/dashboard','/vendor/shops','/orders')
+    'vendor.nguyengiati@starshop.local'=@('/vendor/dashboard','/vendor/shops')
+    'vendor.xovietnghetinh@starshop.local'=@('/vendor/dashboard','/vendor/shops')
+    'manager1@starshop.local'=@('/manager','/manager/shops','/manager/products','/manager/orders','/manager/reports')
+    'manager2@starshop.local'=@('/manager','/manager/shops','/manager/products','/manager/orders','/manager/reports')
     'shipper@starshop.local'=@('/shipper/orders','/notifications')
 }
 foreach($email in $routes.Keys) {
@@ -27,10 +29,28 @@ foreach($email in $routes.Keys) {
         $denied=Invoke-WebRequest "$RootUrl/manager" -WebSession $roleSession -SkipHttpErrorCheck
         if($denied.StatusCode -ne 403) { throw "Role boundary failed for $email" }
     }
-    if($email.StartsWith('manager.')) {
+    if($email.StartsWith('manager')) {
         $shopPage=Invoke-WebRequest "$RootUrl/manager/shops" -WebSession $roleSession
-        if($email.StartsWith('manager.thuduc') -and $shopPage.Content.Contains('StarShop Bình Thạnh')) { throw 'Manager Thủ Đức sees another branch.' }
-        if($email.StartsWith('manager.binhthanh') -and $shopPage.Content.Contains('StarShop Thủ Đức')) { throw 'Manager Bình Thạnh sees another branch.' }
+        if($email -eq 'manager1@starshop.local') {
+            if($shopPage.Content.Contains('StarShop Nguyễn Gia Trí')) { throw 'Manager Thủ Đức sees a Bình Thạnh branch.' }
+            if(!$shopPage.Content.Contains('StarShop Võ Văn Ngân')) { throw 'Manager 1 cannot see the Võ Văn Ngân branch.' }
+            if(!$shopPage.Content.Contains('StarShop Lê Văn Việt')) { throw 'Manager Thủ Đức cannot see the second Thủ Đức branch.' }
+        }
+        if($email -eq 'manager2@starshop.local') {
+            if($shopPage.Content.Contains('StarShop Võ Văn Ngân')) { throw 'Manager Bình Thạnh sees a Thủ Đức branch.' }
+            if(!$shopPage.Content.Contains('StarShop Nguyễn Gia Trí')) { throw 'Manager 2 cannot see the Nguyễn Gia Trí branch.' }
+            if(!$shopPage.Content.Contains('StarShop Xô Viết Nghệ Tĩnh')) { throw 'Manager Bình Thạnh cannot see the second Bình Thạnh branch.' }
+        }
+    }
+    if($email.StartsWith('vendor.')) {
+        $vendorPage=Invoke-WebRequest "$RootUrl/vendor/shops" -WebSession $roleSession
+        $vendorBranch=switch($email) {
+            'vendor.vovanngan@starshop.local' { 'StarShop Võ Văn Ngân' }
+            'vendor.leuvanviet@starshop.local' { 'StarShop Lê Văn Việt' }
+            'vendor.nguyengiati@starshop.local' { 'StarShop Nguyễn Gia Trí' }
+            'vendor.xovietnghetinh@starshop.local' { 'StarShop Xô Viết Nghệ Tĩnh' }
+        }
+        if(!$vendorPage.Content.Contains($vendorBranch)) { throw "$email cannot see its assigned shop." }
     }
 }
 Write-Output 'All local role accounts signed in and rendered their pages; basic role and branch boundaries passed.'

@@ -68,6 +68,9 @@ public class ManagerShopServiceImpl implements ManagerShopService {
         if (shop.getStatus() != ShopStatus.PENDING) {
             throw new IllegalArgumentException("Chỉ có thể duyệt cửa hàng đang chờ");
         }
+        if (shop.getManager() == null) {
+            throw new IllegalArgumentException("Hãy phân công Manager phụ trách trước khi duyệt cửa hàng");
+        }
         shop.setStatus(ShopStatus.ACTIVE);
         User owner = shop.getOwner();
         if (owner.getRoles().stream().noneMatch(role -> role.getName() == RoleName.VENDOR)) {

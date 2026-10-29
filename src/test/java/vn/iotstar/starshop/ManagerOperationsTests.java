@@ -20,6 +20,19 @@ class ManagerOperationsTests {
     @Autowired ShippingProviderRepository providers;
     @Autowired ShipperAssignmentRepository assignments;
 
+    @Test void disablingProviderHidesItFromCheckoutAndCanBeReversed() {
+        ShippingProvider provider = new ShippingProvider();
+        provider.setName("Toggle " + UUID.randomUUID());
+        provider.setBaseFee(new BigDecimal("20000")); provider.setEstimatedDays(2);
+        provider.setActive(true); provider = providers.save(provider);
+        Long id = provider.getId();
+        service.setProviderActive(id, false);
+        assertFalse(providers.findById(id).orElseThrow().isActive());
+        assertTrue(providers.findByActiveTrueOrderByNameAsc().stream().noneMatch(p -> p.getId().equals(id)));
+        service.setProviderActive(id, true);
+        assertTrue(providers.findByActiveTrueOrderByNameAsc().stream().anyMatch(p -> p.getId().equals(id)));
+    }
+
     @Test void assignmentContinuesIntoExistingShipperFlow() {
         User owner = account(RoleName.USER);
         User shipper = account(RoleName.SHIPPER);

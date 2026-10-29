@@ -29,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ShopRepository shopRepository;
     private final CategoryRepository categoryRepository;
     private final vn.iotstar.starshop.repository.ProductModerationRepository moderations;
+    private final jakarta.persistence.EntityManager entityManager;
 
     @Override
     @Transactional(readOnly = true)
@@ -168,6 +169,30 @@ public class ProductServiceImpl implements ProductService {
         product.setStatus(ProductStatus.INACTIVE);
 
         productRepository.save(product);
+    }
+
+    @Override
+    public void deleteProduct(Long productId, Long shopId, Long ownerId) {
+        getProductByOwner(productId, shopId, ownerId);
+        Product product = productRepository.findForModeration(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm"));
+        long orderCount = entityManager.createQuery(
+                "select count(d) from OrderDetail d where d.product.id = :id", Long.class)
+                .setParameter("id", productId).getSingleResult();
+        long reviewCount = entityManager.createQuery(
+                "select count(r) from Review r where r.product.id = :id", Long.class)
+                .setParameter("id", productId).getSingleResult();
+        if (orderCount > 0 || reviewCount > 0 || product.getSoldCount() > 0) {
+            throw new IllegalArgumentException(
+                    "Sản phẩm đã phát sinh đơn hàng hoặc lượt bán nên không thể xóa. Bạn có thể chọn Ngừng bán.");
+        }
+        for (String entity : List.of("CartItem", "Wishlist", "ProductView", "ProductImage")) {
+            entityManager.createQuery("delete from " + entity + " e where e.product.id = :id")
+                    .setParameter("id", productId).executeUpdate();
+        }
+        moderations.findById(productId).ifPresent(moderations::delete);
+        productRepository.delete(product);
+        productRepository.flush();
     }
 
     @Override

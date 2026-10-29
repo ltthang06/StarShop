@@ -491,6 +491,23 @@ public class VendorProductController {
                 + "/products";
     }
 
+    @PostMapping("/{productId}/remove")
+    public String deleteProduct(@PathVariable Long shopId, @PathVariable Long productId,
+            Authentication authentication, RedirectAttributes redirectAttributes) {
+        User owner = getCurrentUser(authentication);
+        if (owner == null) return "redirect:/vendor";
+        try {
+            productService.deleteProduct(productId, shopId, owner.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa sản phẩm.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Sản phẩm đang được sử dụng nên không thể xóa. Bạn có thể chọn Ngừng bán.");
+        }
+        return "redirect:/vendor/shops/" + shopId + "/products";
+    }
+
     private void saveUploadedImages(
             Product product,
             MultipartFile[] images)

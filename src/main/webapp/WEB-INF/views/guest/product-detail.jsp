@@ -24,6 +24,8 @@
                 <c:out value="${product.categoryName}"/>
             </p>
             <h1><c:out value="${product.name}"/></h1>
+            <c:url var="productShopUrl" value="/shop/${product.shopId}"/>
+            <p>Cửa hàng: <a href="${productShopUrl}"><c:out value="${product.shopName}"/></a></p>
             <p class="price fs-3">
                 <c:choose>
                     <c:when test="${not empty product.discountPrice}">
@@ -37,7 +39,7 @@
                     </c:otherwise>
                 </c:choose>
             </p>
-            <p>Đã bán: ${product.soldCount} · Đánh giá: ${product.rating}/5</p>
+            <p>Đã bán: ${product.soldCount} · <c:choose><c:when test="${product.rating gt 0}">Đánh giá: ${product.rating}/5</c:when><c:otherwise>Chưa có đánh giá</c:otherwise></c:choose></p>
             <p style="white-space: pre-line">
                 <c:out value="${product.description}"/>
             </p>
@@ -68,6 +70,13 @@
 
     <section class="mt-5">
         <h2 class="section-title">Đánh giá của khách hàng</h2>
+        <c:choose>
+            <c:when test="${not empty reviewTarget}">
+                <c:url var="writeReviewUrl" value="/orders/${reviewTarget.orderId}/items/${reviewTarget.detailId}/review"/>
+                <a class="btn btn-outline-danger mb-3" href="${writeReviewUrl}">Viết đánh giá</a>
+            </c:when>
+            <c:otherwise><p class="small text-muted">Bạn có thể đánh giá trong Đơn hàng của tôi sau khi đơn hàng đã giao.</p></c:otherwise>
+        </c:choose>
         <c:choose>
             <c:when test="${empty reviews}">
                 <p class="text-muted">Sản phẩm chưa có đánh giá.</p>

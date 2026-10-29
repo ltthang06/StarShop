@@ -252,7 +252,9 @@ public class PublicShopServiceImpl
                 rating,
                 product.getCategory().getId(),
                 product.getCategory().getName(),
-                imageUrl
+                imageUrl,
+                product.getShop().getId(),
+                product.getShop().getName()
         );
     }
 }

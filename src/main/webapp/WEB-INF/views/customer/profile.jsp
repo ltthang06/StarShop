@@ -82,10 +82,10 @@
                                     <c:out value="${address.phone}"/>
                                 </p>
                                 <p class="text-muted">
-                                    <c:out value="${address.addressLine}"/>,
-                                    <c:out value="${address.ward}"/>,
-                                    <c:out value="${address.district}"/>,
-                                    <c:out value="${address.province}"/>
+                                    <c:out value="${address.addressLine}"/>
+                                    <c:if test="${not empty address.ward}">, <c:out value="${address.ward}"/></c:if>
+                                    <c:if test="${not empty address.district}">, <c:out value="${address.district}"/></c:if>
+                                    <c:if test="${not empty address.province}">, <c:out value="${address.province}"/></c:if>
                                 </p>
                                 <div class="d-flex gap-2 flex-wrap">
                                     <a href="${editUrl}"

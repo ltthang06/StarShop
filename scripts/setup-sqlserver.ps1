@@ -38,20 +38,12 @@ BOOTSTRAP_ADMIN_PASSWORD=$adminPassword
 spring.profiles.active=demo
 starshop.demo-catalog.enabled=true
 starshop.demo-catalog.owner-email=admin@starshop.local
-spring.mail.host=
-spring.mail.port=587
-spring.mail.username=
-spring.mail.password=
-cloudinary.cloud-name=
-cloudinary.api-key=
-cloudinary.api-secret=
 "@ | Set-Content -LiteralPath $settingsPath -Encoding utf8
     $acl = Get-Acl -LiteralPath $settingsPath
     $acl.SetAccessRuleProtection($true, $false)
     $rule = New-Object System.Security.AccessControl.FileSystemAccessRule([System.Security.Principal.WindowsIdentity]::GetCurrent().Name, 'FullControl', 'Allow')
     $acl.SetAccessRule($rule)
     Set-Acl -LiteralPath $settingsPath -AclObject $acl
-    Copy-Item -LiteralPath (Join-Path $repoPath 'config/services.example.properties') -Destination (Join-Path $localPath 'services.properties')
     Add-Content -LiteralPath $settingsPath -Value 'spring.config.import=optional:file:./.local/services.properties'
     Write-Output 'Created StarShopLocal and private .local/application-local.properties.'
 } finally { $sqlConnection.Dispose() }

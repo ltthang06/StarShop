@@ -41,6 +41,20 @@ class VnpayPaymentTests {
     @Autowired VnpayReconciliationService reconciliation;
     @org.springframework.boot.test.mock.mockito.SpyBean VnpayQueryGateway queryGateway;
 
+    @Test void paymentUsesPublicHttpsOriginForReturnInsteadOfLocalhost() throws Exception {
+        var f=fixture();String ref=place(f);
+        String previous=config.getReturnUrl();config.setReturnUrl("");
+        try {
+            var result=mvc.perform(get("/payments/"+ref+"/redirect")
+                    .with(user(f.buyer().getEmail()).roles("USER"))
+                    .with(request -> {request.setScheme("https");request.setServerName("starshop.example");request.setServerPort(443);return request;}))
+                    .andExpect(status().is3xxRedirection()).andReturn();
+            String url=java.net.URLDecoder.decode(result.getResponse().getHeader("Location"),java.nio.charset.StandardCharsets.UTF_8);
+            assertTrue(url.contains("vnp_ReturnUrl=https://starshop.example/payments/vnpay/return"));
+            assertFalse(url.contains("127.0.0.1"+":8080/payments/vnpay/return"));
+        } finally {config.setReturnUrl(previous);}
+    }
+
     @Test void checkoutGroupsTwoShopsAndProcessesIpnOnce() throws Exception {
         var f=fixture();String ref=place(f);
         var p=paymentRows.findById(ref).orElseThrow();assertEquals(new BigDecimal("250000.00"),p.getAmount());

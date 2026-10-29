@@ -32,4 +32,6 @@ public class PublicProductCard {
     private String categoryName;
 
     private String imageUrl;
+    private Long shopId;
+    private String shopName;
 }

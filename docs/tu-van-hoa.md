@@ -2,7 +2,7 @@
 
 Khung tư vấn ở góc dưới các trang mua sắm. Khách có thể hỏi theo dịp, ngân sách hoặc màu sắc, rồi mở sản phẩm từ liên kết bên dưới câu trả lời.
 
-Backend gọi Gemini bằng khóa trong `.local/gemini.properties`. Sao chép cấu trúc từ `config/gemini.example.properties`, điền khóa trên máy và thêm `optional:file:./.local/gemini.properties` vào `spring.config.import` của cấu hình local. Không đưa khóa vào JavaScript, JSP, log hoặc Git. Tắt chức năng bằng `starshop.gemini.enabled=false`.
+Backend gọi Gemini bằng cấu hình dùng chung trong `src/main/resources/gemini-team.properties`. Có thể thay khóa bằng biến môi trường `GEMINI_API_KEY` hoặc file `.local/gemini.properties`; project tự đọc file này khi khởi động. File mẫu nằm tại `config/gemini.example.properties`. Không đưa khóa vào JavaScript, JSP hoặc log. Tắt chức năng bằng `starshop.gemini.enabled=false`.
 
 Mỗi lượt gửi câu hỏi và tối đa ba cặp hội thoại gần nhất cùng danh mục công khai còn hàng đến Google. Không truy vấn tài khoản, địa chỉ, đơn hàng hoặc thông tin thanh toán. Hội thoại lưu trong session máy chủ. Đầu vào tối đa 1.000 ký tự. Sản phẩm gợi ý được kiểm tra lại theo danh mục đã gửi, bỏ ID không tồn tại và trùng lặp. Giao diện hiển thị văn bản bằng `textContent`.
 

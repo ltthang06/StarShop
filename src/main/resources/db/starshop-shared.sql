@@ -1,4 +1,4 @@
-﻿USE [master];
+USE [master];
 
 GO
 
@@ -324,9 +324,13 @@ INSERT INTO [dbo].[commissions] ([id],[active],[end_at],[rate_percent],[start_at
 
 INSERT INTO [dbo].[commissions] ([id],[active],[end_at],[rate_percent],[start_at],[shop_id]) VALUES (3,1,NULL,5.00,N'2026-10-23T23:29:55.4484650',3);
 
+INSERT INTO [dbo].[commissions] ([id],[active],[end_at],[rate_percent],[start_at],[shop_id]) VALUES (4,1,NULL,5.00,N'2026-10-28T14:00:00.0000000',4);
+
+INSERT INTO [dbo].[commissions] ([id],[active],[end_at],[rate_percent],[start_at],[shop_id]) VALUES (5,1,NULL,5.00,N'2026-10-28T14:00:00.0000000',5);
+
 SET IDENTITY_INSERT [dbo].[commissions] OFF;
 
-DBCC CHECKIDENT (N'[dbo].[commissions]', RESEED, 3) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'[dbo].[commissions]', RESEED, 5) WITH NO_INFOMSGS;
 
 SET IDENTITY_INSERT [dbo].[notifications] ON;
 
@@ -900,9 +904,13 @@ INSERT INTO [dbo].[product_images] ([id],[image_url],[primary_image],[public_id]
 
 INSERT INTO [dbo].[product_images] ([id],[image_url],[primary_image],[public_id],[product_id]) VALUES (9,N'https://res.cloudinary.com/ckaav9vf/image/upload/v1793019204/starshop/products/d9bpki2tu59tevfazwjr.webp',1,N'starshop/products/d9bpki2tu59tevfazwjr',9);
 
+INSERT INTO [dbo].[product_images] ([id],[image_url],[primary_image],[public_id],[product_id]) VALUES (51,N'https://res.cloudinary.com/ckaav9vf/image/upload/starshop/products/branch-levanviet.webp',1,N'starshop/products/branch-levanviet',51);
+
+INSERT INTO [dbo].[product_images] ([id],[image_url],[primary_image],[public_id],[product_id]) VALUES (52,N'https://res.cloudinary.com/ckaav9vf/image/upload/starshop/products/branch-xovietnghetinh.webp',1,N'starshop/products/branch-xovietnghetinh',52);
+
 SET IDENTITY_INSERT [dbo].[product_images] OFF;
 
-DBCC CHECKIDENT (N'[dbo].[product_images]', RESEED, 50) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'[dbo].[product_images]', RESEED, 52) WITH NO_INFOMSGS;
 
 SET IDENTITY_INSERT [dbo].[product_views] ON;
 
@@ -1020,9 +1028,13 @@ INSERT INTO [dbo].[products] ([id],[created_at],[description],[discount_price],[
 
 INSERT INTO [dbo].[products] ([id],[created_at],[description],[discount_price],[name],[price],[quantity],[rating],[sold_count],[status],[category_id],[shop_id]) VALUES (9,N'2026-10-16T13:38:25.1444150',N'Bó Hoa Đẹp Tặng Sinh Nhật Bạn Gái. Bó hoa sinh nhật dành tặng những người thân yêu trong các dịp đặc biệt. Liên hệ cửa hàng để được tư vấn thời gian giao và cách bảo quản hoa.',800000.00,N'Bó Hoa Đẹp Tặng Sinh Nhật Bạn Gái',950000.00,30,0.0,20,N'ACTIVE',1,1);
 
+INSERT INTO [dbo].[products] ([id],[created_at],[description],[discount_price],[name],[price],[quantity],[rating],[sold_count],[status],[category_id],[shop_id]) VALUES (51,N'2026-10-28T14:00:00.0000000',N'Hoa tươi được chuẩn bị tại chi nhánh StarShop Lê Văn Việt.',NULL,N'Bó Hoa Thủ Đức Dịu Dàng',520000.00,20,0,14,N'ACTIVE',1,4);
+
+INSERT INTO [dbo].[products] ([id],[created_at],[description],[discount_price],[name],[price],[quantity],[rating],[sold_count],[status],[category_id],[shop_id]) VALUES (52,N'2026-10-28T14:00:00.0000000',N'Hoa tươi được chuẩn bị tại chi nhánh StarShop Xô Viết Nghệ Tĩnh.',NULL,N'Kệ Hoa Bình Thạnh Tươi Sáng',780000.00,20,0,16,N'ACTIVE',5,5);
+
 SET IDENTITY_INSERT [dbo].[products] OFF;
 
-DBCC CHECKIDENT (N'[dbo].[products]', RESEED, 50) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'[dbo].[products]', RESEED, 52) WITH NO_INFOMSGS;
 
 SET IDENTITY_INSERT [dbo].[promotions] ON;
 
@@ -1098,15 +1110,19 @@ DBCC CHECKIDENT (N'[dbo].[shipping_providers]', RESEED, 2) WITH NO_INFOMSGS;
 
 SET IDENTITY_INSERT [dbo].[shops] ON;
 
-INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (1,N'Quận 1, TP. Hồ Chí Minh',NULL,N'2026-10-16T13:38:25.0316630',N'Bộ sưu tập hoa dành cho sinh nhật, chúc mừng và những dịp đặc biệt.',NULL,NULL,N'StarShop Central',N'02838220001',N'ACTIVE',1,2);
+INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (1,N'Quận 1, TP. Hồ Chí Minh',NULL,N'2026-10-16T13:38:25.0316630',N'Chi nhánh trung tâm do Admin theo dõi trực tiếp.',NULL,NULL,N'StarShop Central',N'02838220001',N'ACTIVE',1,NULL);
 
-INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (2,N'TP. Thủ Đức, TP. Hồ Chí Minh',NULL,N'2026-10-23T23:29:55.2693940',N'Hoa tươi cho sinh nhật, chúc mừng và những dịp đặc biệt. Giao hoa tận nơi tại TP. Hồ Chí Minh.',NULL,NULL,N'StarShop Thủ Đức',N'02838220002',N'ACTIVE',4,2);
+INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (2,N'123 Võ Văn Ngân, TP. Thủ Đức, TP. Hồ Chí Minh',NULL,N'2026-10-23T23:29:55.2693940',N'Hoa tươi cho sinh nhật, chúc mừng và những dịp đặc biệt. Giao hoa tận nơi tại TP. Hồ Chí Minh.',NULL,NULL,N'StarShop Võ Văn Ngân',N'02838220002',N'ACTIVE',4,2);
 
-INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (3,N'Bình Thạnh, TP. Hồ Chí Minh',NULL,N'2026-10-23T23:29:55.2794050',N'Hoa tươi cho sinh nhật, chúc mừng và những dịp đặc biệt. Giao hoa tận nơi tại TP. Hồ Chí Minh.',NULL,NULL,N'StarShop Bình Thạnh',N'02838220003',N'ACTIVE',5,3);
+INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (3,N'55 Nguyễn Gia Trí, Bình Thạnh, TP. Hồ Chí Minh',NULL,N'2026-10-23T23:29:55.2794050',N'Hoa tươi cho sinh nhật, chúc mừng và những dịp đặc biệt. Giao hoa tận nơi tại TP. Hồ Chí Minh.',NULL,NULL,N'StarShop Nguyễn Gia Trí',N'02838220003',N'ACTIVE',5,3);
+
+INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (4,N'198 Lê Văn Việt, TP. Thủ Đức, TP. Hồ Chí Minh',NULL,N'2026-10-28T14:00:00.0000000',N'Chi nhánh Thủ Đức do Manager Thủ Đức phụ trách.',NULL,NULL,N'StarShop Lê Văn Việt',N'02838220004',N'ACTIVE',8,2);
+
+INSERT INTO [dbo].[shops] ([id],[address],[banner],[created_at],[description],[email],[logo],[name],[phone],[status],[owner_id],[manager_id]) VALUES (5,N'225 Xô Viết Nghệ Tĩnh, Bình Thạnh, TP. Hồ Chí Minh',NULL,N'2026-10-28T14:00:00.0000000',N'Chi nhánh Bình Thạnh do Manager Bình Thạnh phụ trách.',NULL,NULL,N'StarShop Xô Viết Nghệ Tĩnh',N'02838220005',N'ACTIVE',9,3);
 
 SET IDENTITY_INSERT [dbo].[shops] OFF;
 
-DBCC CHECKIDENT (N'[dbo].[shops]', RESEED, 3) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'[dbo].[shops]', RESEED, 5) WITH NO_INFOMSGS;
 
 INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (1,1);
 
@@ -1126,25 +1142,37 @@ INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (6,5);
 
 INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (7,3);
 
+INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (8,3);
+
+INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (8,4);
+
+INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (9,3);
+
+INSERT INTO [dbo].[user_roles] ([user_id],[role_id]) VALUES (9,4);
+
 SET IDENTITY_INSERT [dbo].[users] ON;
 
 INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (1,NULL,N'2026-10-16T13:38:24.7374480',N'admin@starshop.local',N'StarShop Admin',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (2,NULL,N'2026-10-23T23:29:54.5341860',N'manager.thuduc@starshop.local',N'Nguyễn Minh Anh',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (2,NULL,N'2026-10-23T23:29:54.5341860',N'manager1@starshop.local',N'Nguyễn Minh Anh - Manager 1',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (3,NULL,N'2026-10-23T23:29:54.6836360',N'manager.binhthanh@starshop.local',N'Trần Ngọc Linh',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (3,NULL,N'2026-10-23T23:29:54.6836360',N'manager2@starshop.local',N'Trần Ngọc Linh - Manager 2',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (4,NULL,N'2026-10-23T23:29:54.7656380',N'vendor.thuduc@starshop.local',N'Lê Thanh Hà',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (4,NULL,N'2026-10-23T23:29:54.7656380',N'vendor.vovanngan@starshop.local',N'Lê Thanh Hà',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
-INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (5,NULL,N'2026-10-23T23:29:54.8818930',N'vendor.binhthanh@starshop.local',N'Phạm Hoàng Nam',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (5,NULL,N'2026-10-23T23:29:54.8818930',N'vendor.nguyengiati@starshop.local',N'Phạm Hoàng Nam',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
 INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (6,NULL,N'2026-10-23T23:29:55.0036400',N'shipper@starshop.local',N'Võ Thành Đạt',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
 INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (7,NULL,N'2026-10-23T23:29:55.1278630',N'customer@starshop.local',N'Nguyễn Khánh An',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
 
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (8,NULL,N'2026-10-28T14:00:00.0000000',N'vendor.leuvanviet@starshop.local',N'Nguyễn Hoài Phương',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+
+INSERT INTO [dbo].[users] ([id],[avatar],[created_at],[email],[full_name],[password],[phone],[status]) VALUES (9,NULL,N'2026-10-28T14:00:00.0000000',N'vendor.xovietnghetinh@starshop.local',N'Trần Quốc Bảo',N'$2a$10$MxTQUPthm/2oWS9luiJqouMtralI9K0OzBo0mGZ5UCQZEIKKTxPPm',NULL,N'ACTIVE');
+
 SET IDENTITY_INSERT [dbo].[users] OFF;
 
-DBCC CHECKIDENT (N'[dbo].[users]', RESEED, 8) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'[dbo].[users]', RESEED, 9) WITH NO_INFOMSGS;
 
 INSERT INTO [dbo].[vnpay_payment_orders] ([payment_reference],[order_id]) VALUES (N'SSSHARED00000001',19);
 

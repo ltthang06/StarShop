@@ -41,7 +41,7 @@ public class ShowcaseOrderSetup implements ApplicationRunner {
         var address=addresses.findByUserIdOrderByDefaultAddressDescIdAsc(buyer.getId()).get(0);
         var provider=providers.findAll().stream().filter(p -> "StarShop Express".equals(p.getName())).findFirst().orElseThrow();
         var shipper=users.findByEmail("shipper@starshop.local").orElseThrow();
-        var branchShops=shops.findAll().stream().filter(s -> s.getName().equals("StarShop Thủ Đức") || s.getName().equals("StarShop Bình Thạnh"))
+        var branchShops=shops.findAll().stream().filter(s -> s.getName().equals("StarShop Võ Văn Ngân") || s.getName().equals("StarShop Nguyễn Gia Trí"))
                 .sorted(Comparator.comparing(Shop::getId)).toList();
         if(branchShops.size()!=2) throw new IllegalStateException("Cần hai cửa hàng chi nhánh");
         var productList=products.findAll().stream().sorted(Comparator.comparing(Product::getId)).toList();
@@ -98,12 +98,12 @@ public class ShowcaseOrderSetup implements ApplicationRunner {
             return;
         }
         if(target==OrderStatus.NEW) return;
-        login(shop.getName().equals("StarShop Thủ Đức") ? "vendor.thuduc@starshop.local" : "vendor.binhthanh@starshop.local","VENDOR");
+        login(shop.getName().equals("StarShop Võ Văn Ngân") ? "vendor.vovanngan@starshop.local" : "vendor.nguyengiati@starshop.local","VENDOR");
         if(status(id)==OrderStatus.NEW) vendor.confirmOrder(id,shop.getId(),shop.getOwner().getId());
         if(target==OrderStatus.CONFIRMED) return;
         if(status(id)==OrderStatus.CONFIRMED) vendor.markReadyForPickup(id,shop.getId(),shop.getOwner().getId());
         if(target==OrderStatus.READY_FOR_PICKUP) return;
-        login(shop.getName().equals("StarShop Thủ Đức") ? "manager.thuduc@starshop.local" : "manager.binhthanh@starshop.local","MANAGER");
+        login(shop.getName().equals("StarShop Võ Văn Ngân") ? "manager1@starshop.local" : "manager2@starshop.local","MANAGER");
         if(status(id)==OrderStatus.READY_FOR_PICKUP) manager.assign(id,shipper.getId(),providerId,"");
         if(target==OrderStatus.ASSIGNED) return;
         Long assignmentId=assignments.findByOrder_Id(id).orElseThrow().getId();
@@ -117,7 +117,7 @@ public class ShowcaseOrderSetup implements ApplicationRunner {
         login(buyer.getEmail(),"USER");
         if(status(id)==OrderStatus.DELIVERED) history.requestReturn(buyer.getEmail(),id);
         if(target==OrderStatus.RETURN_REQUESTED) return;
-        login(shop.getName().equals("StarShop Thủ Đức") ? "vendor.thuduc@starshop.local" : "vendor.binhthanh@starshop.local","VENDOR");
+        login(shop.getName().equals("StarShop Võ Văn Ngân") ? "vendor.vovanngan@starshop.local" : "vendor.nguyengiati@starshop.local","VENDOR");
         if(status(id)==OrderStatus.RETURN_REQUESTED) vendor.markReturned(id,shop.getId(),shop.getOwner().getId());
         if(target==OrderStatus.RETURNED) return;
         if(status(id)==OrderStatus.RETURNED) vendor.refundOrder(id,shop.getId(),shop.getOwner().getId());

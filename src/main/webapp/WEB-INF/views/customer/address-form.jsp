@@ -4,6 +4,8 @@
 
 <c:url var="profileUrl" value="/profile"/>
 <c:url var="submitUrl" value="${formAction}"/>
+<c:url var="addressPickerScript" value="/js/address-picker.js"/>
+<c:url var="addressDataUrl" value="/data/vietnam-addresses.json"/>
 
 <main class="container py-5">
     <div class="col-lg-7 mx-auto">
@@ -11,7 +13,10 @@
             ${empty address.id ? 'Thêm địa chỉ' : 'Sửa địa chỉ'}
         </h1>
 
-        <form action="${submitUrl}" method="post" class="card shadow-sm">
+        <form action="${submitUrl}" method="post" class="card shadow-sm"
+              data-address-picker data-province="<c:out value='${address.province}'/>"
+              data-ward="<c:out value='${address.ward}'/>"
+              data-source="${addressDataUrl}">
             <div class="card-body">
                 <input type="hidden" name="${_csrf.parameterName}"
                        value="${_csrf.token}">
@@ -40,23 +45,21 @@
                                value="<c:out value='${address.addressLine}'/>"
                                maxlength="255" required>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label" for="ward">Phường, xã</label>
-                        <input class="form-control" id="ward" name="ward"
-                               value="<c:out value='${address.ward}'/>"
-                               maxlength="100">
+                    <div class="col-md-6">
+                        <label class="form-label" for="province">Tỉnh/Thành phố</label>
+                        <select class="form-select" id="province" name="province" required disabled>
+                            <option value="">Đang tải danh sách...</option>
+                        </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label" for="district">Quận, huyện</label>
-                        <input class="form-control" id="district" name="district"
-                               value="<c:out value='${address.district}'/>"
-                               maxlength="100">
+                    <div class="col-md-6">
+                        <label class="form-label" for="ward">Phường/Xã</label>
+                        <select class="form-select" id="ward" name="ward" required disabled>
+                            <option value="">Chọn tỉnh/thành phố trước</option>
+                        </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label" for="province">Tỉnh, thành phố</label>
-                        <input class="form-control" id="province" name="province"
-                               value="<c:out value='${address.province}'/>"
-                               maxlength="100">
+                    <div class="col-12">
+                        <div class="form-text">Địa chỉ hiện dùng cấp Tỉnh/Thành phố và Phường/Xã. Ghi số nhà, tên đường ở ô phía trên.</div>
+                        <div class="small text-danger mt-1" id="addressPickerStatus" role="status" aria-live="polite"></div>
                     </div>
                     <div class="col-12">
                         <label class="form-check-label">
@@ -79,4 +82,5 @@
     </div>
 </main>
 
+<script defer src="${addressPickerScript}"></script>
 <%@ include file="../common/footer.jsp" %>

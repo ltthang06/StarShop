@@ -46,5 +46,7 @@ public interface ProductService {
             Long ownerId
     );
 
+    void deleteProduct(Long productId, Long shopId, Long ownerId);
+
     List<Category> getActiveCategories();
 }

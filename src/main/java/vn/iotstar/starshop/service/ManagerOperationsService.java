@@ -7,6 +7,7 @@ public interface ManagerOperationsService {
     Page<User> users(String keyword, int page);
     void setUserLocked(Long id, boolean locked, String actorEmail, boolean actorAdmin);
     void saveProvider(ShippingProviderForm form);
+    void setProviderActive(Long id, boolean active);
     Page<Order> orders(OrderStatus status, int page);
     vn.iotstar.starshop.dto.ManagerOrderView orderDetail(Long id);
     void assign(Long orderId, Long shipperId, Long providerId, String note);
